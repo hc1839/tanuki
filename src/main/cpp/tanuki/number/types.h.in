@@ -1,0 +1,24 @@
+#ifndef TANUKI_NUMBER_TYPES_H
+#define TANUKI_NUMBER_TYPES_H
+
+#include <complex>
+
+namespace tanuki {
+namespace number {
+
+/**
+ *  @brief Type of real number.
+ *
+ *  It can be <tt>float</tt> or <tt>double</tt>. Other types are undefined.
+ */
+using real_t = @TANUKI_REAL_T@;
+
+/**
+ *  @brief Type of complex number.
+ */
+using complex_t = std::complex<real_t>;
+
+} // namespace number
+} // namespace tanuki
+
+#endif

@@ -1,0 +1,34 @@
+@PACKAGE_INIT@
+
+set(Tanuki_VERSION @TANUKI_VERSION@)
+set(Tanuki_REAL_T @TANUKI_REAL_T@)
+
+set_and_check(Tanuki_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
+set_and_check(Tanuki_LIB_DIR "@PACKAGE_CMAKE_INSTALL_LIBDIR@")
+set_and_check(Tanuki_SHARE_DIR "@PACKAGE_CMAKE_INSTALL_DATAROOTDIR@")
+
+if(BUILD_SHARED_LIBS)
+  set_and_check(
+    Tanuki_LIBRARIES
+    "${Tanuki_LIB_DIR}/@TANUKI_SHARED_LIB_FILE_NAME@"
+  )
+else()
+  set_and_check(
+    Tanuki_LIBRARIES
+    "${Tanuki_LIB_DIR}/@TANUKI_STATIC_LIB_FILE_NAME@"
+  )
+endif()
+
+file(
+  READ
+  "${Tanuki_SHARE_DIR}/tanuki/avro/number_array.avsc"
+  Tanuki_NUMBER_ARRAY_AVSC
+)
+
+file(
+  READ
+  "${Tanuki_SHARE_DIR}/tanuki/avro/spin.avsc"
+  Tanuki_SPIN_AVSC
+)
+
+check_required_components(Tanuki)

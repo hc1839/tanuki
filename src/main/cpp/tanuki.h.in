@@ -1,0 +1,6 @@
+#ifndef TANUKI_H
+#define TANUKI_H
+
+@HDR_INCS@
+
+#endif
