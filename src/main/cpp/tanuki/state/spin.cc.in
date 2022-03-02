@@ -1,0 +1,93 @@
+#include "tanuki/state/spin.h"
+
+#include <array>
+#include <fstream>
+#include <map>
+#include <memory>
+#include <stdexcept>
+#include <string>
+
+#include <avro/Compiler.hh>
+#include <avro/Generic.hh>
+#include <avro/GenericDatum.hh>
+
+namespace tanuki {
+namespace state {
+
+using std::ifstream;
+using std::string;
+using std::unique_ptr;
+
+const avro::ValidSchema &SpinAvroSchema() {
+  static unique_ptr<avro::ValidSchema> schema;
+
+  if (schema == nullptr) {
+    schema.reset(new avro::ValidSchema());
+
+    string avsc_path;
+
+    avsc_path += "@CMAKE_INSTALL_PREFIX@";
+    avsc_path += "/@CMAKE_INSTALL_DATAROOTDIR@";
+    avsc_path += "/tanuki/state/spin.avsc";
+
+    ifstream ifs(avsc_path);
+    avro::compileJsonSchema(ifs, *schema);
+  }
+
+  return *schema;
+}
+
+} // namespace state
+} // namespace tanuki
+
+namespace avro {
+
+using std::string;
+
+using tanuki::state::SpinAvroSchema;
+
+void codec_traits<Spin>::encode(Encoder &e, const Spin &o) {
+  GenericDatum avro_enum(SpinAvroSchema());
+  avro_enum.value<GenericEnum>().set(EnumNameOf(o));
+  avro::encode(e, avro_enum);
+}
+
+void codec_traits<Spin>::decode(Decoder &d, Spin &o) {
+  GenericDatum avro_enum(SpinAvroSchema());
+  avro::decode(d, avro_enum);
+  o = EnumValueOf<Spin>(avro_enum.value<GenericEnum>().symbol());
+}
+
+} // namespace avro
+
+template <>
+std::string EnumNameOf(tanuki::state::Spin enumerator) {
+  using tanuki::state::Spin;
+
+  static const std::map<Spin, std::string> mapping = {
+    { Spin::DUAL, "DUAL" },
+    { Spin::UP, "UP" },
+    { Spin::DOWN, "DOWN" }
+  };
+
+  return mapping.at(enumerator);
+}
+
+template <>
+tanuki::state::Spin EnumValueOf(const std::string &name) {
+  using tanuki::state::Spin;
+
+  static const std::array<Spin, 3> enumerators = {
+    Spin::DUAL,
+    Spin::UP,
+    Spin::DOWN
+  };
+
+  for (const auto &enumerator : enumerators) {
+    if (EnumNameOf(enumerator) == name) {
+      return enumerator;
+    }
+  }
+
+  throw std::out_of_range("Invalid enumerator name: " + name);
+}

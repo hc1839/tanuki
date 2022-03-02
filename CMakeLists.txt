@@ -126,6 +126,7 @@ add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/memory)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/number)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/parallel)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/state)
+add_subdirectory(${SRC_MAIN_RESOURCES_DIR})
 
 # Build include directives.
 set(HDR_INCS ${HDRS})
@@ -254,6 +255,7 @@ if(BUILD_TEST)
   include(GoogleTest)
 
   add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/math)
+  add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/state)
 
   enable_testing()
 

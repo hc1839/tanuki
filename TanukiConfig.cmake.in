@@ -19,16 +19,4 @@ else()
   )
 endif()
 
-file(
-  READ
-  "${Tanuki_SHARE_DIR}/tanuki/avro/number_array.avsc"
-  Tanuki_NUMBER_ARRAY_AVSC
-)
-
-file(
-  READ
-  "${Tanuki_SHARE_DIR}/tanuki/avro/spin.avsc"
-  Tanuki_SPIN_AVSC
-)
-
 check_required_components(Tanuki)

@@ -1,0 +1,263 @@
+#include "tanuki/math/linear/number_array.h"
+
+#include <algorithm>
+#include <cassert>
+#include <fstream>
+#include <memory>
+#include <numeric>
+#include <string>
+
+#include <avro/Compiler.hh>
+
+namespace tanuki {
+namespace math {
+namespace linear {
+
+using std::ifstream;
+using std::string;
+using std::unique_ptr;
+
+const avro::ValidSchema &NumberArray::AvroSchema() {
+  static unique_ptr<avro::ValidSchema> schema;
+
+  if (schema == nullptr) {
+    schema.reset(new avro::ValidSchema());
+
+    string avsc_path;
+
+    avsc_path += "@CMAKE_INSTALL_PREFIX@";
+    avsc_path += "/@CMAKE_INSTALL_DATAROOTDIR@";
+    avsc_path += "/tanuki/math/linear/number_array.avsc";
+
+    ifstream ifs(avsc_path);
+    avro::compileJsonSchema(ifs, *schema);
+  }
+
+  return *schema;
+}
+
+size_t NumberArray::num_elems() const {
+  return std::accumulate(
+      extents.begin(), extents.end(), 1,
+      [](const size_t &acc, const size_t &item) -> size_t {
+        return acc * item;
+      });
+}
+
+template <>
+NumberArray ArmaMatToNumberArray(const Mat<real_t> &src) {
+  NumberArray retval = {
+    .is_complex = false,
+    .extents = { src.n_rows, src.n_cols },
+    .real = vector<real_t>(src.n_elem)
+  };
+
+  std::copy(src.begin(), src.end(), retval.real.begin());
+
+  return retval;
+}
+
+template <>
+NumberArray ArmaMatToNumberArray(const Mat<complex_t> &src) {
+  NumberArray retval = {
+    .is_complex = true,
+    .extents = { src.n_rows, src.n_cols },
+    .real = vector<real_t>(src.n_elem),
+    .imag = vector<real_t>(src.n_elem)
+  };
+
+  // Copy real and imaginary parts.
+  {
+    auto real_it = retval.real.begin();
+    auto imag_it = retval.imag.begin();
+
+    for (const auto &item : src) {
+      *real_it++ = item.real();
+      *imag_it++ = item.imag();
+    }
+  }
+
+  return retval;
+}
+
+template <>
+NumberArray ArmaCubeToNumberArray(const Cube<real_t> &src) {
+  NumberArray retval = {
+    .is_complex = false,
+    .extents = { src.n_rows, src.n_cols, src.n_slices },
+    .real = vector<real_t>(src.n_elem)
+  };
+
+  std::copy(src.begin(), src.end(), retval.real.begin());
+
+  return retval;
+}
+
+template <>
+NumberArray ArmaCubeToNumberArray(const Cube<complex_t> &src) {
+  NumberArray retval = {
+    .is_complex = true,
+    .extents = { src.n_rows, src.n_cols, src.n_slices },
+    .real = vector<real_t>(src.n_elem),
+    .imag = vector<real_t>(src.n_elem)
+  };
+
+  // Copy real and imaginary parts.
+  {
+    auto real_it = retval.real.begin();
+    auto imag_it = retval.imag.begin();
+
+    for (const auto &item : src) {
+      *real_it++ = item.real();
+      *imag_it++ = item.imag();
+    }
+  }
+
+  return retval;
+}
+
+template <>
+Mat<real_t> NumberArrayToArmaMat(const NumberArray &src) {
+#ifndef TANUKI_NO_DEBUG
+  assert(!src.is_complex);
+  assert(src.extents.size() == 2);
+#endif
+
+  Mat<real_t> retval(src.extents[0], src.extents[1]);
+
+  std::copy(src.real.begin(), src.real.end(), retval.begin());
+
+  return retval;
+}
+
+template <>
+Mat<complex_t> NumberArrayToArmaMat(const NumberArray &src) {
+#ifndef TANUKI_NO_DEBUG
+  assert(src.extents.size() == 2);
+#endif
+
+  Mat<complex_t> retval(src.extents[0], src.extents[1]);
+
+  // Copy real and imaginary parts.
+  if (src.is_complex) {
+    auto real_it = src.real.begin();
+    auto imag_it = src.imag.begin();
+
+    for (auto &item : retval) {
+      item = complex_t(*real_it++, *imag_it++);
+    }
+  } else {
+    std::copy(src.real.begin(), src.real.end(), retval.begin());
+  }
+
+  return retval;
+}
+
+template <>
+Cube<real_t> NumberArrayToArmaCube(const NumberArray &src) {
+#ifndef TANUKI_NO_DEBUG
+  assert(!src.is_complex);
+  assert(src.extents.size() == 3);
+#endif
+
+  Cube<real_t> retval(src.extents[0], src.extents[1], src.extents[2]);
+
+  std::copy(src.real.begin(), src.real.end(), retval.begin());
+
+  return retval;
+}
+
+template <>
+Cube<complex_t> NumberArrayToArmaCube(const NumberArray &src) {
+#ifndef TANUKI_NO_DEBUG
+  assert(src.extents.size() == 3);
+#endif
+
+  Cube<complex_t> retval(src.extents[0], src.extents[1], src.extents[2]);
+
+  // Copy real and imaginary parts.
+  if (src.is_complex) {
+    auto real_it = src.real.begin();
+    auto imag_it = src.imag.begin();
+
+    for (auto &item : retval) {
+      item = complex_t(*real_it++, *imag_it++);
+    }
+  } else {
+    std::copy(src.real.begin(), src.real.end(), retval.begin());
+  }
+
+  return retval;
+}
+
+} // namespace linear
+} // namespace math
+} // namespace tanuki
+
+namespace avro {
+
+using std::vector;
+
+void codec_traits<NumberArray>::encode(Encoder &e, const NumberArray &o) {
+#ifndef TANUKI_NO_DEBUG
+  {
+    const size_t num_elems = o.num_elems();
+
+    assert(o.real.size() == num_elems);
+
+    if (o.is_complex) {
+      assert(o.imag.size() == num_elems);
+    }
+  }
+#endif
+
+  avro::encode(e, o.is_complex);
+  avro::encode(e, vector<long>(o.extents.begin(), o.extents.end()));
+  avro::encode(e, vector<double>(o.real.begin(), o.real.end()));
+  avro::encode(e, vector<double>(o.imag.begin(), o.imag.end()));
+}
+
+void codec_traits<NumberArray>::decode(Decoder &d, NumberArray &o) {
+  avro::decode(d, o.is_complex);
+
+  // Decode extents.
+  {
+    vector<long> shape;
+    avro::decode(d, shape);
+
+    o.extents.resize(shape.size());
+    std::copy(shape.begin(), shape.end(), o.extents.begin());
+  }
+
+  // Decode real parts.
+  {
+    vector<double> real_parts;
+    avro::decode(d, real_parts);
+
+    o.real.resize(real_parts.size());
+    std::copy(real_parts.begin(), real_parts.end(), o.real.begin());
+  }
+
+  // Decode imaginary parts.
+  {
+    vector<double> imag_parts;
+    avro::decode(d, imag_parts);
+
+    o.imag.resize(imag_parts.size());
+    std::copy(imag_parts.begin(), imag_parts.end(), o.imag.begin());
+  }
+
+#ifndef TANUKI_NO_DEBUG
+  {
+    const size_t num_elems = o.num_elems();
+
+    assert(o.real.size() == num_elems);
+
+    if (o.is_complex) {
+      assert(o.imag.size() == num_elems);
+    }
+  }
+#endif
+}
+
+} // namespace avro

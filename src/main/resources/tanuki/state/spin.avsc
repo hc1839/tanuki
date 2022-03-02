@@ -1,0 +1,7 @@
+{
+  "type": "enum",
+  "name": "Spin",
+  "namespace": "tanuki.state",
+  "doc": "Spin of a species.",
+  "symbols": ["DUAL", "UP", "DOWN"]
+}

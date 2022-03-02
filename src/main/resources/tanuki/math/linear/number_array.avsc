@@ -1,0 +1,37 @@
+{
+  "type": "record",
+  "name": "NumberArray",
+  "namespace": "tanuki.math.linear",
+  "doc": "Array of numbers that are either real or complex.",
+  "fields": [
+    {
+      "name": "is_complex",
+      "doc": "Whether the numbers are complex.",
+      "type": "boolean"
+    },
+    {
+      "name": "extents",
+      "doc": "Shape of the array. Number of elements is the number of dimensions.",
+      "type": {
+        "type": "array",
+        "items": "long"
+      }
+    },
+    {
+      "name": "real",
+      "doc": "Real part of the array in column-major order.",
+      "type": {
+        "type": "array",
+        "items": "double"
+      }
+    },
+    {
+      "name": "imag",
+      "doc": "Imaginary part of the array in column-major order. It is not used if `is_complex` is `false`.",
+      "type": {
+        "type": "array",
+        "items": "double"
+      }
+    }
+  ]
+}
