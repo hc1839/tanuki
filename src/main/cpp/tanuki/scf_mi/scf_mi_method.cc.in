@@ -1,0 +1,89 @@
+#include "tanuki/scf_mi/scf_mi_method.h"
+
+#include <array>
+#include <fstream>
+#include <map>
+#include <memory>
+#include <stdexcept>
+#include <string>
+
+#include <avro/Compiler.hh>
+#include <avro/Generic.hh>
+#include <avro/GenericDatum.hh>
+
+namespace tanuki {
+namespace scf_mi {
+
+using std::ifstream;
+using std::string;
+using std::unique_ptr;
+
+const avro::ValidSchema &ScfMiMethodAvroSchema() {
+  static unique_ptr<avro::ValidSchema> schema;
+
+  if (schema == nullptr) {
+    schema.reset(new avro::ValidSchema());
+
+    string avsc_path;
+
+    avsc_path += "@CMAKE_INSTALL_PREFIX@";
+    avsc_path += "/@CMAKE_INSTALL_DATAROOTDIR@";
+    avsc_path += "/tanuki/scf_mi/scf_mi_method.avsc";
+
+    ifstream ifs(avsc_path);
+    avro::compileJsonSchema(ifs, *schema);
+  }
+
+  return *schema;
+}
+
+} // namespace scf_mi
+} // namespace tanuki
+
+namespace avro {
+
+using std::string;
+
+using tanuki::scf_mi::ScfMiMethodAvroSchema;
+
+void codec_traits<ScfMiMethod>::encode(Encoder &e, const ScfMiMethod &o) {
+  GenericDatum avro_enum(ScfMiMethodAvroSchema());
+  avro_enum.value<GenericEnum>().set(EnumNameOf(o));
+  avro::encode(e, avro_enum);
+}
+
+void codec_traits<ScfMiMethod>::decode(Decoder &d, ScfMiMethod &o) {
+  GenericDatum avro_enum(ScfMiMethodAvroSchema());
+  avro::decode(d, avro_enum);
+  o = EnumValueOf<ScfMiMethod>(avro_enum.value<GenericEnum>().symbol());
+}
+
+} // namespace avro
+
+template <>
+std::string EnumNameOf(tanuki::scf_mi::ScfMiMethod enumerator) {
+  using tanuki::scf_mi::ScfMiMethod;
+
+  static const std::map<ScfMiMethod, std::string> mapping = {
+    { ScfMiMethod::LMO, "LMO" }
+  };
+
+  return mapping.at(enumerator);
+}
+
+template <>
+tanuki::scf_mi::ScfMiMethod EnumValueOf(const std::string &name) {
+  using tanuki::scf_mi::ScfMiMethod;
+
+  static const std::array<ScfMiMethod, 1> enumerators = {
+    ScfMiMethod::LMO
+  };
+
+  for (const auto &enumerator : enumerators) {
+    if (EnumNameOf(enumerator) == name) {
+      return enumerator;
+    }
+  }
+
+  throw std::out_of_range("Invalid enumerator name: " + name);
+}

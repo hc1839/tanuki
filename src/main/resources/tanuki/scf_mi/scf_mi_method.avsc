@@ -1,0 +1,7 @@
+{
+  "type": "enum",
+  "name": "ScfMiMethod",
+  "namespace": "tanuki.scf_mi",
+  "doc": "SCF-MI method.",
+  "symbols": ["LMO"]
+}

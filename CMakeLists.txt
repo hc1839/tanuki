@@ -125,6 +125,7 @@ add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/math)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/memory)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/number)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/parallel)
+add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/scf_mi)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/state)
 add_subdirectory(${SRC_MAIN_RESOURCES_DIR})
 
@@ -255,6 +256,7 @@ if(BUILD_TEST)
   include(GoogleTest)
 
   add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/math)
+  add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/scf_mi)
   add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/state)
 
   enable_testing()
