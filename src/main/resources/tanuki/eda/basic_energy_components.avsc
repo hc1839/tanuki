@@ -1,0 +1,33 @@
+{
+  "type": "record",
+  "name": "BasicEnergyComponents",
+  "namespace": "tanuki.eda",
+  "doc": "Basic absolute-energy components used across EDA schemes for evaluating EDA components.",
+  "fields": [
+    {
+      "name": "kinetic_coulomb",
+      "doc": "Kinetic energy and energy due to Coulomb forces.",
+      "type": "double"
+    },
+    {
+      "name": "exchange",
+      "doc": "Exchange energy.",
+      "type": "double"
+    },
+    {
+      "name": "correlation",
+      "doc": "Correlation energy.",
+      "type": "double"
+    },
+    {
+      "name": "disp_correction",
+      "doc": "Dispersion correction.",
+      "type": "double"
+    },
+    {
+      "name": "mix",
+      "doc": "Mixing term. It is any remaining part of the total energy that cannot be assigned to a specific category or is context-dependent.",
+      "type": "double"
+    }
+  ]
+}
