@@ -7,6 +7,7 @@ list(
   tanuki/interop/c_poly_pointer.h
   tanuki/interop/foreign_forwarder.h
   tanuki/interop/foreign_pointer.h
+  tanuki/interop/foreign_sequence.h
 )
 
 list(
