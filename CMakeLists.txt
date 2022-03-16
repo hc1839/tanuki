@@ -119,6 +119,7 @@ include_directories(
 # Add subdirectories, and configure files.
 
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/algorithm)
+add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/avro_specific)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/common)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/eda)
 add_subdirectory(${SRC_MAIN_CPP_DIR}/tanuki/enumeration)
@@ -258,6 +259,7 @@ if(BUILD_TEST)
   include(GoogleTest)
 
   add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/algorithm)
+  add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/avro_specific)
   add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/eda)
   add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/math)
   add_subdirectory(${SRC_TEST_CPP_DIR}/tanuki/scf_mi)

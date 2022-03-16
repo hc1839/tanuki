@@ -1,0 +1,17 @@
+#ifndef TANUKI_AVRO_SPECIFIC_REAL_SCHEMA_H
+#define TANUKI_AVRO_SPECIFIC_REAL_SCHEMA_H
+
+#include <avro/Schema.hh>
+
+namespace tanuki {
+namespace avro_specific {
+
+/**
+ *  @brief Avro schema for @link tanuki::number::real_t @endlink.
+ */
+using RealSchema = avro::@TANUKI_AVRO_REAL_SCHEMA_TYPENAME@;
+
+} // namespace avro_specific
+} // namespace tanuki
+
+#endif
