@@ -22,7 +22,7 @@
       "doc": "Real part of the array in column-major order.",
       "type": {
         "type": "array",
-        "items": "double"
+        "items": "@TANUKI_REAL_T@"
       }
     },
     {
@@ -30,7 +30,7 @@
       "doc": "Imaginary part of the array in column-major order. It is not used if `is_complex` is `false`.",
       "type": {
         "type": "array",
-        "items": "double"
+        "items": "@TANUKI_REAL_T@"
       }
     }
   ]

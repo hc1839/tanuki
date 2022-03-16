@@ -9,6 +9,8 @@
 
 #include <avro/Compiler.hh>
 
+#include "tanuki/avro_specific/size_t.h"
+
 namespace tanuki {
 namespace math {
 namespace linear {
@@ -212,40 +214,16 @@ void codec_traits<NumberArray>::encode(Encoder &e, const NumberArray &o) {
 #endif
 
   avro::encode(e, o.is_complex);
-  avro::encode(e, vector<long>(o.extents.begin(), o.extents.end()));
-  avro::encode(e, vector<double>(o.real.begin(), o.real.end()));
-  avro::encode(e, vector<double>(o.imag.begin(), o.imag.end()));
+  avro::encode(e, o.extents);
+  avro::encode(e, o.real);
+  avro::encode(e, o.imag);
 }
 
 void codec_traits<NumberArray>::decode(Decoder &d, NumberArray &o) {
   avro::decode(d, o.is_complex);
-
-  // Decode extents.
-  {
-    vector<long> shape;
-    avro::decode(d, shape);
-
-    o.extents.resize(shape.size());
-    std::copy(shape.begin(), shape.end(), o.extents.begin());
-  }
-
-  // Decode real parts.
-  {
-    vector<double> real_parts;
-    avro::decode(d, real_parts);
-
-    o.real.resize(real_parts.size());
-    std::copy(real_parts.begin(), real_parts.end(), o.real.begin());
-  }
-
-  // Decode imaginary parts.
-  {
-    vector<double> imag_parts;
-    avro::decode(d, imag_parts);
-
-    o.imag.resize(imag_parts.size());
-    std::copy(imag_parts.begin(), imag_parts.end(), o.imag.begin());
-  }
+  avro::decode(d, o.extents);
+  avro::decode(d, o.real);
+  avro::decode(d, o.imag);
 
 #ifndef TANUKI_NO_DEBUG
   {
