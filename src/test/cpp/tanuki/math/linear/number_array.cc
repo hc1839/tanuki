@@ -13,7 +13,7 @@
 #include <boost/multi_array.hpp>
 #include <gtest/gtest.h>
 
-#define ARMA_EQUAL_RELDIFF 1.0e-3
+#define APPROX_EQUAL_RELDIFF 1.0e-3
 
 using std::array;
 using std::complex;
@@ -24,13 +24,9 @@ using arma::Mat;
 using boost::fortran_storage_order;
 using boost::multi_array;
 
-using tanuki::math::linear::ArmaCubeToNumberArray;
-using tanuki::math::linear::ArmaMatToNumberArray;
-using tanuki::math::linear::MultiToNumberArray;
+using tanuki::math::linear::DecodeFromNumberArray;
+using tanuki::math::linear::EncodeToNumberArray;
 using tanuki::math::linear::NumberArray;
-using tanuki::math::linear::NumberArrayToArmaCube;
-using tanuki::math::linear::NumberArrayToArmaMat;
-using tanuki::math::linear::NumberToMultiArray;
 using tanuki::number::complex_t;
 using tanuki::number::real_t;
 
@@ -61,7 +57,11 @@ TEST(NumberArrayAvroTest, RealNumberArrayAvro) {
     encoder->init(*mem_out);
 
     // Convert Boost multi-array to Avro.
-    avro::encode(*encoder, MultiToNumberArray(input_marr));
+    {
+      NumberArray narr;
+      EncodeToNumberArray(narr, input_marr);
+      avro::encode(*encoder, narr);
+    }
 
     // Test real-to-real.
     {
@@ -69,10 +69,15 @@ TEST(NumberArrayAvroTest, RealNumberArrayAvro) {
       auto decoder = avro::validatingDecoder(schema, avro::binaryDecoder());
       decoder->init(*mem_in);
 
+      multi_array<real_t, 2> output_marr(
+          boost::extents[0][0], fortran_storage_order());
+
       // Convert Avro to real Boost multi-array.
-      NumberArray output_narr;
-      avro::decode(*decoder, output_narr);
-      auto output_marr = NumberToMultiArray<real_t, 2>(output_narr);
+      {
+        NumberArray narr;
+        avro::decode(*decoder, narr);
+        DecodeFromNumberArray(narr, output_marr);
+      }
 
       const Mat<real_t> output_mat(
           output_marr.data(),
@@ -83,7 +88,7 @@ TEST(NumberArrayAvroTest, RealNumberArrayAvro) {
           input_mat,
           output_mat,
           "reldiff",
-          ARMA_EQUAL_RELDIFF);
+          APPROX_EQUAL_RELDIFF);
 
       ASSERT_TRUE(is_equal);
     }
@@ -98,10 +103,15 @@ TEST(NumberArrayAvroTest, RealNumberArrayAvro) {
       auto decoder = avro::validatingDecoder(schema, avro::binaryDecoder());
       decoder->init(*mem_in);
 
+      multi_array<complex_t, 2> output_marr(
+          boost::extents[0][0], fortran_storage_order());
+
       // Convert Avro to complex Boost multi-array.
-      NumberArray output_narr;
-      avro::decode(*decoder, output_narr);
-      auto output_marr = NumberToMultiArray<complex_t, 2>(output_narr);
+      {
+        NumberArray narr;
+        avro::decode(*decoder, narr);
+        DecodeFromNumberArray(narr, output_marr);
+      }
 
       const Mat<complex_t> output_mat(
           output_marr.data(),
@@ -112,7 +122,7 @@ TEST(NumberArrayAvroTest, RealNumberArrayAvro) {
           complex_input_mat,
           output_mat,
           "reldiff",
-          ARMA_EQUAL_RELDIFF);
+          APPROX_EQUAL_RELDIFF);
 
       ASSERT_TRUE(is_equal);
     }
@@ -146,16 +156,25 @@ TEST(NumberArrayAvroTest, ComplexNumberArrayAvro) {
     encoder->init(*mem_out);
 
     // Convert Boost multi-array to Avro.
-    avro::encode(*encoder, MultiToNumberArray(input_marr));
+    {
+      NumberArray narr;
+      EncodeToNumberArray(narr, input_marr);
+      avro::encode(*encoder, narr);
+    }
 
     auto mem_in = avro::memoryInputStream(*mem_out);
     auto decoder = avro::validatingDecoder(schema, avro::binaryDecoder());
     decoder->init(*mem_in);
 
+    multi_array<complex_t, 2> output_marr(
+        boost::extents[0][0], fortran_storage_order());
+
     // Convert Avro to complex Boost multi-array.
-    NumberArray output_narr;
-    avro::decode(*decoder, output_narr);
-    auto output_marr = NumberToMultiArray<complex_t, 2>(output_narr);
+    {
+      NumberArray narr;
+      avro::decode(*decoder, narr);
+      DecodeFromNumberArray(narr, output_marr);
+    }
 
     const Mat<complex_t> output_mat(
         output_marr.data(),
@@ -166,7 +185,7 @@ TEST(NumberArrayAvroTest, ComplexNumberArrayAvro) {
         input_mat,
         output_mat,
         "reldiff",
-        ARMA_EQUAL_RELDIFF);
+        APPROX_EQUAL_RELDIFF);
 
     ASSERT_TRUE(is_equal);
   }
@@ -179,14 +198,19 @@ TEST(NumberArrayAvroTest, ComplexNumberArrayAvro) {
 TEST(NumberArrayArmaMatConversion, RealConversion) {
   const Mat<real_t> input_mat(5, 8, arma::fill::randu);
 
-  const auto output_mat = NumberArrayToArmaMat<real_t>(
-      ArmaMatToNumberArray(input_mat));
+  Mat<real_t> output_mat;
+
+  {
+    NumberArray narr;
+    EncodeToNumberArray(narr, input_mat);
+    DecodeFromNumberArray(narr, output_mat);
+  }
 
   const bool is_equal = arma::approx_equal(
       input_mat,
       output_mat,
       "reldiff",
-      ARMA_EQUAL_RELDIFF);
+      APPROX_EQUAL_RELDIFF);
 
   ASSERT_TRUE(is_equal);
 }
@@ -200,14 +224,19 @@ TEST(NumberArrayArmaMatConversion, ComplexConversion) {
   {
     const Mat<complex_t> input_mat(5, 8, arma::fill::randu);
 
-    const auto output_mat = NumberArrayToArmaMat<complex_t>(
-        ArmaMatToNumberArray(input_mat));
+    Mat<complex_t> output_mat;
+
+    {
+      NumberArray narr;
+      EncodeToNumberArray(narr, input_mat);
+      DecodeFromNumberArray(narr, output_mat);
+    }
 
     const bool is_equal = arma::approx_equal(
         input_mat,
         output_mat,
         "reldiff",
-        ARMA_EQUAL_RELDIFF);
+        APPROX_EQUAL_RELDIFF);
 
     ASSERT_TRUE(is_equal);
   }
@@ -215,6 +244,16 @@ TEST(NumberArrayArmaMatConversion, ComplexConversion) {
   // Compare real-to-complex conversion.
   {
     const Mat<real_t> input_mat_real(5, 8, arma::fill::randu);
+
+    Mat<complex_t> output_mat;
+
+    {
+      NumberArray narr;
+      EncodeToNumberArray(narr, input_mat_real);
+      DecodeFromNumberArray(narr, output_mat);
+    }
+
+    // Complex version of the input matrix for comparison.
     Mat<complex_t> input_mat_complex(arma::size(input_mat_real));
 
     std::copy(
@@ -222,14 +261,11 @@ TEST(NumberArrayArmaMatConversion, ComplexConversion) {
         input_mat_real.end(),
         input_mat_complex.begin());
 
-    const auto output_mat = NumberArrayToArmaMat<complex_t>(
-        ArmaMatToNumberArray(input_mat_real));
-
     const bool is_equal = arma::approx_equal(
         input_mat_complex,
         output_mat,
         "reldiff",
-        ARMA_EQUAL_RELDIFF);
+        APPROX_EQUAL_RELDIFF);
 
     ASSERT_TRUE(is_equal);
   }
@@ -242,14 +278,19 @@ TEST(NumberArrayArmaMatConversion, ComplexConversion) {
 TEST(NumberArrayArmaCubeConversion, RealConversion) {
   const Cube<real_t> input_cube(5, 8, 2, arma::fill::randu);
 
-  const auto output_cube = NumberArrayToArmaCube<real_t>(
-      ArmaCubeToNumberArray(input_cube));
+  Cube<real_t> output_cube;
+
+  {
+    NumberArray narr;
+    EncodeToNumberArray(narr, input_cube);
+    DecodeFromNumberArray(narr, output_cube);
+  }
 
   const bool is_equal = arma::approx_equal(
       input_cube,
       output_cube,
       "reldiff",
-      ARMA_EQUAL_RELDIFF);
+      APPROX_EQUAL_RELDIFF);
 
   ASSERT_TRUE(is_equal);
 }
@@ -263,14 +304,19 @@ TEST(NumberArrayArmaCubeConversion, ComplexConversion) {
   {
     const Cube<complex_t> input_cube(5, 8, 2, arma::fill::randu);
 
-    const auto output_cube = NumberArrayToArmaCube<complex_t>(
-        ArmaCubeToNumberArray(input_cube));
+    Cube<complex_t> output_cube;
+
+    {
+      NumberArray narr;
+      EncodeToNumberArray(narr, input_cube);
+      DecodeFromNumberArray(narr, output_cube);
+    }
 
     const bool is_equal = arma::approx_equal(
         input_cube,
         output_cube,
         "reldiff",
-        ARMA_EQUAL_RELDIFF);
+        APPROX_EQUAL_RELDIFF);
 
     ASSERT_TRUE(is_equal);
   }
@@ -278,6 +324,16 @@ TEST(NumberArrayArmaCubeConversion, ComplexConversion) {
   // Compare real-to-complex conversion.
   {
     const Cube<real_t> input_cube_real(5, 8, 2, arma::fill::randu);
+
+    Cube<complex_t> output_cube;
+
+    {
+      NumberArray narr;
+      EncodeToNumberArray(narr, input_cube_real);
+      DecodeFromNumberArray(narr, output_cube);
+    }
+
+    // Complex version of the input matrix for comparison.
     Cube<complex_t> input_cube_complex(arma::size(input_cube_real));
 
     std::copy(
@@ -285,14 +341,11 @@ TEST(NumberArrayArmaCubeConversion, ComplexConversion) {
         input_cube_real.end(),
         input_cube_complex.begin());
 
-    const auto output_cube = NumberArrayToArmaCube<complex_t>(
-        ArmaCubeToNumberArray(input_cube_real));
-
     const bool is_equal = arma::approx_equal(
         input_cube_complex,
         output_cube,
         "reldiff",
-        ARMA_EQUAL_RELDIFF);
+        APPROX_EQUAL_RELDIFF);
 
     ASSERT_TRUE(is_equal);
   }

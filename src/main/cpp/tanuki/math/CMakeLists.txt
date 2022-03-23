@@ -17,6 +17,7 @@ list(
   tanuki/math/linear/matrix_index_pair.h
   tanuki/math/linear/matrix_product.h
   tanuki/math/linear/number_array.h
+  tanuki/math/linear/number_array_specific.h
   tanuki/math/linear/qr_decomposition.h
   tanuki/math/linear/rotation_matrix_spec.h
   tanuki/math/linear/triangular_matrix.h
@@ -29,6 +30,7 @@ list(
 
   ${BUILD_SRC_MAIN_CPP_DIR}/tanuki/math/linear/number_array.cc
   ${SRC_MAIN_CPP_DIR}/tanuki/math/combinatorics/combinations.cc
+  ${SRC_MAIN_CPP_DIR}/tanuki/math/linear/number_array_specific.cc
   ${SRC_MAIN_CPP_DIR}/tanuki/math/linear/rotation_matrix_spec.cc
 )
 

@@ -3,12 +3,10 @@
 
 #include <vector>
 
-#include <armadillo>
 #include <avro/Decoder.hh>
 #include <avro/Encoder.hh>
 #include <avro/Specific.hh>
 #include <avro/ValidSchema.hh>
-#include <boost/multi_array.hpp>
 
 #include "tanuki/number/types.h"
 
@@ -18,11 +16,6 @@ namespace linear {
 
 using std::vector;
 
-using arma::Cube;
-using arma::Mat;
-using boost::const_multi_array_ref;
-using boost::multi_array;
-using tanuki::number::complex_t;
 using tanuki::number::real_t;
 
 /**
@@ -64,91 +57,54 @@ struct NumberArray final {
 };
 
 /**
- *  @brief Converts from <tt>boost::const_multi_array_ref</tt> to @link
- *  NumberArray @endlink.
- */
-template <typename E, size_t D>
-NumberArray MultiToNumberArray(const const_multi_array_ref<E, D> &src);
-
-/**
- *  @brief Converts from <tt>boost::multi_array</tt> to @link NumberArray
+ *  @brief Custom conversions with @link NumberArray @endlink that is called by
+ *  @link EncodeToNumberArray @endlink and @link DecodeFromNumberArray
  *  @endlink.
+ *
+ *  @tparam T
+ *    Type being converted.
  */
-template <typename E, size_t D>
-NumberArray MultiToNumberArray(const multi_array<E, D> &src);
-
-/**
- *  @brief Converts from @link NumberArray @endlink to
- *  <tt>boost::multi_array</tt>.
- */
-template <typename E, size_t D>
-multi_array<E, D> NumberToMultiArray(const NumberArray &src);
-
 template <typename T>
-NumberArray ArmaMatToNumberArray(const Mat<T> &src);
+struct NumberArrayConvert final {
+ public:
+  /**
+   *  @brief Converts to @link NumberArray @endlink.
+   *
+   *  It is called by @link EncodeToNumberArray @endlink.
+   */
+  static void Encode(NumberArray &e, const T &o);
+
+  /**
+   *  @brief Converts from @link NumberArray @endlink.
+   *
+   *  It is called by @link DecodeFromNumberArray @endlink.
+   */
+  static void Decode(const NumberArray &e, T &o);
+};
 
 /**
- *  @brief Converts from real <tt>arma::Mat</tt> to @link NumberArray @endlink.
+ *  @brief Converts to @link NumberArray @endlink.
+ *
+ *  To implement custom conversion from a type, define @link
+ *  NumberArrayConvert::Encode @endlink.
+ *
+ *  @tparam T
+ *    Type being converted from.
  */
-template <>
-NumberArray ArmaMatToNumberArray(const Mat<real_t> &src);
-
-/**
- *  @brief Converts from complex <tt>arma::Mat</tt> to @link NumberArray
- *  @endlink.
- */
-template <>
-NumberArray ArmaMatToNumberArray(const Mat<complex_t> &src);
-
 template <typename T>
-NumberArray ArmaCubeToNumberArray(const Cube<T> &src);
+void EncodeToNumberArray(NumberArray &e, const T &o);
 
 /**
- *  @brief Converts from real <tt>arma::Cube</tt> to @link NumberArray
- *  @endlink.
+ *  @brief Converts from @link NumberArray @endlink.
+ *
+ *  To implement custom conversion to a type, define @link
+ *  NumberArrayConvert::Decode @endlink.
+ *
+ *  @tparam T
+ *    Type being converted to.
  */
-template <>
-NumberArray ArmaCubeToNumberArray(const Cube<real_t> &src);
-
-/**
- *  @brief Converts from complex <tt>arma::Cube</tt> to @link NumberArray
- *  @endlink.
- */
-template <>
-NumberArray ArmaCubeToNumberArray(const Cube<complex_t> &src);
-
 template <typename T>
-Mat<T> NumberArrayToArmaMat(const NumberArray &src);
-
-/**
- *  @brief Converts from @link NumberArray @endlink to real <tt>arma::Mat</tt>.
- */
-template <>
-Mat<real_t> NumberArrayToArmaMat(const NumberArray &src);
-
-/**
- *  @brief Converts from @link NumberArray @endlink to complex
- *  <tt>arma::Mat</tt>.
- */
-template <>
-Mat<complex_t> NumberArrayToArmaMat(const NumberArray &src);
-
-template <typename T>
-Cube<T> NumberArrayToArmaCube(const NumberArray &src);
-
-/**
- *  @brief Converts from @link NumberArray @endlink to real
- *  <tt>arma::Cube</tt>.
- */
-template <>
-Cube<real_t> NumberArrayToArmaCube(const NumberArray &src);
-
-/**
- *  @brief Converts from @link NumberArray @endlink to complex
- *  <tt>arma::Cube</tt>.
- */
-template <>
-Cube<complex_t> NumberArrayToArmaCube(const NumberArray &src);
+void DecodeFromNumberArray(const NumberArray &d, T &o);
 
 } // namespace linear
 } // namespace math
