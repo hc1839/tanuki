@@ -93,3 +93,148 @@ void codec_traits<NumberArray>::decode(Decoder &d, NumberArray &o) {
 }
 
 } // namespace avro
+
+using tanuki::math::linear::NumberArray;
+using tanuki::number::real_t;
+
+/**
+ *  @brief Default constructs @link NumberArray @endlink.
+ */
+extern "C"
+NumberArray *NumberArray_new() {
+  return new NumberArray();
+}
+
+/**
+ *  @brief Destructs @link NumberArray @endlink.
+ */
+extern "C"
+void NumberArray_delete(NumberArray *self) {
+  delete self;
+}
+
+/**
+ *  @brief @link NumberArray::num_elems @endlink.
+ */
+extern "C"
+size_t NumberArray_num_elems(const NumberArray *self) {
+  return self->num_elems();
+}
+
+/**
+ *  @brief @link NumberArray::is_complex @endlink as an <tt>int</tt>.
+ */
+extern "C"
+int NumberArray_is_complex(const NumberArray *self) {
+  return self->is_complex ? 1 : 0;
+}
+
+/**
+ *  @brief Sets @link NumberArray::is_complex @endlink using an <tt>int</tt>.
+ */
+extern "C"
+void NumberArray_set_is_complex(NumberArray *self, int value) {
+  self->is_complex = value != 0;
+}
+
+/**
+ *  @brief Number of elements in @link NumberArray::extents @endlink.
+ */
+extern "C"
+size_t NumberArray_extents_size(const NumberArray *self) {
+  return self->extents.size();
+}
+
+/**
+ *  @brief Resizes @link NumberArray::extents @endlink.
+ */
+extern "C"
+void NumberArray_extents_resize(NumberArray *self, size_t count) {
+  self->extents.resize(count);
+}
+
+/**
+ *  @brief Immutable pointer to the beginning of @link NumberArray::extents
+ *  @endlink.
+ */
+extern "C"
+const size_t *NumberArray_extents(const NumberArray *self) {
+  return self->extents.data();
+}
+
+/**
+ *  @brief Mutable pointer to the beginning of @link NumberArray::extents
+ *  @endlink.
+ */
+extern "C"
+size_t *NumberArray_mutable_extents(NumberArray *self) {
+  return self->extents.data();
+}
+
+/**
+ *  @brief Number of elements in @link NumberArray::real @endlink.
+ */
+extern "C"
+size_t NumberArray_real_size(const NumberArray *self) {
+  return self->real.size();
+}
+
+/**
+ *  @brief Resizes @link NumberArray::real @endlink.
+ */
+extern "C"
+void NumberArray_real_resize(NumberArray *self, size_t count) {
+  self->real.resize(count);
+}
+
+/**
+ *  @brief Immutable pointer to the beginning of @link NumberArray::real
+ *  @endlink.
+ */
+extern "C"
+const real_t *NumberArray_real(const NumberArray *self) {
+  return self->real.data();
+}
+
+/**
+ *  @brief Mutable pointer to the beginning of @link NumberArray::real
+ *  @endlink.
+ */
+extern "C"
+real_t *NumberArray_mutable_real(NumberArray *self) {
+  return self->real.data();
+}
+
+/**
+ *  @brief Number of elements in @link NumberArray::imag @endlink.
+ */
+extern "C"
+size_t NumberArray_imag_size(const NumberArray *self) {
+  return self->imag.size();
+}
+
+/**
+ *  @brief Resizes @link NumberArray::imag @endlink.
+ */
+extern "C"
+void NumberArray_imag_resize(NumberArray *self, size_t count) {
+  self->imag.resize(count);
+}
+
+/**
+ *  @brief Immutable pointer to the beginning of @link NumberArray::imag
+ *  @endlink.
+ */
+extern "C"
+const real_t *NumberArray_imag(const NumberArray *self) {
+  return self->imag.data();
+}
+
+/**
+ *  @brief Mutable pointer to the beginning of @link NumberArray::imag
+ *  @endlink.
+ */
+extern "C"
+real_t *NumberArray_mutable_imag(NumberArray *self) {
+  return self->imag.data();
+}
