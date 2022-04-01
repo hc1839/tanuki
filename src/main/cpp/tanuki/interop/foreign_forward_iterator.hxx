@@ -16,7 +16,7 @@ ForeignForwardIterator<T, D>::ForeignForwardIterator(
     const COpaqueContainer &container, size_t index)
         : container_(container),
           index_(index) {
-  if (index != container.arr.num_elems()) {
+  if (index != container.arr.num_elems) {
     this->item_ = static_cast<pointer>(std::malloc(sizeof(value_type)));
     if (this->item_ == nullptr) {
       throw std::runtime_error("malloc failed.");
@@ -31,7 +31,7 @@ ForeignForwardIterator<T, D>::ForeignForwardIterator(
     const ForeignForwardIterator<T, D> &other)
         : container_(other.container_),
           index_(other.index_) {
-  if (index_ != this->container_.arr.num_elems()) {
+  if (index_ != this->container_.arr.num_elems) {
     this->item_ = static_cast<pointer>(std::malloc(sizeof(value_type)));
     if (this->item_ == nullptr) {
       throw std::runtime_error("malloc failed.");
@@ -96,11 +96,11 @@ ForeignForwardIterator<T, D> &ForeignForwardIterator<T, D>::operator++() {
   ++index_;
   item_->~value_type();
 
-  if (index_ < container_.arr.num_elems()) {
+  if (index_ < container_.arr.num_elems) {
     void *opaque_ptr = static_cast<char *>(container_.arr.ptr) +
         container_.elem_size * index_;
     new(item_) T(opaque_ptr);
-  } else if (index_ == container_.arr.num_elems()) {
+  } else if (index_ == container_.arr.num_elems) {
     std::free(item_);
     item_ = nullptr;
   }

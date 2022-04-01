@@ -3,10 +3,10 @@
 
 #include <cstddef>
 
-#include "tanuki/interop/c_multi_array.h"
+#include "tanuki/interop/c_sequence.h"
 
 /**
- *  @brief Data structure for passing a foreign array of opaque elements of
+ *  @brief Data structure for passing a foreign sequence of opaque elements of
  *  constant size.
  */
 extern "C"
@@ -15,7 +15,7 @@ typedef struct {
   /**
    *  @brief Foreign array.
    */
-  CMultiArray arr;
+  CSequence arr;
 
   /**
    *  @brief Size in bytes of each element.

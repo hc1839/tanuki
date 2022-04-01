@@ -1,7 +1,6 @@
 #include <tanuki.h>
 
 #include <algorithm>
-#include <array>
 #include <cstddef>
 #include <iterator>
 #include <random>
@@ -12,7 +11,6 @@
 
 #define NUM_FOREIGN_ELEMS 8
 
-using std::array;
 using std::string;
 using std::uniform_int_distribution;
 using std::vector;
@@ -62,12 +60,9 @@ TEST(ForeignForwardIteratorTest, ForeignForwardIteratorAccess) {
         [&gen]() -> int { return uniform_int_distribution<>(-32, 32)(gen); });
   }
 
-  array<size_t, 1> foreign_elems_shape = { foreign_elems.size() };
-
   COpaqueContainer foreign_elems_ctnr = {
     .arr = {
-      .num_dims = foreign_elems_shape.size(),
-      .extents = foreign_elems_shape.data(),
+      .num_elems = foreign_elems.size(),
       .ptr = foreign_elems.data()
     },
     .elem_size = sizeof(ForeignElementMock)

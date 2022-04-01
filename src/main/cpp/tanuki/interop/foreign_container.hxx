@@ -38,7 +38,7 @@ auto ForeignContainer<T, S>::cend() const -> const_iterator {
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::size() const -> size_type {
-  return container().arr.num_elems();
+  return container().arr.num_elems;
 }
 
 template <typename T, typename S>
