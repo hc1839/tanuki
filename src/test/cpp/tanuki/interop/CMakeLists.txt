@@ -2,6 +2,7 @@ list(
   APPEND
   TEST_SRCS
 
+  ${SRC_TEST_CPP_DIR}/tanuki/interop/foreign_container.cc
   ${SRC_TEST_CPP_DIR}/tanuki/interop/foreign_forward_iterator.cc
 )
 

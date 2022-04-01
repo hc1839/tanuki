@@ -4,65 +4,69 @@
 #include <cstddef>
 #include <iterator>
 
-#include "tanuki/interop/c_multi_array.h"
+#include "tanuki/interop/foreign_forward_iterator.h"
 
 namespace tanuki {
 namespace interop {
 
 /**
  *  @brief Container that partially satisfies C++ <tt>Container</tt> named
- *  requirement for storing foreign objects.
+ *  requirement for wrapping a foreign array of opaque elements.
  *
- *  @tparam Iter
- *    <tt>LegacyForwardIterator</tt> over the foreign objects in the container.
+ *  @tparam T
+ *    Type of decorated elements being iterated over. See @link
+ *    ForeignForwardIterator @endlink for the requirements.
  *
- *  @tparam SizeType
+ *  @tparam S
  *    <tt>size_type</tt> in the <tt>Container</tt> named requirement.
  */
-template <typename Iter, typename SizeType = size_t>
+template <typename T, typename S = size_t>
 class ForeignContainer {
  public:
-  using value_type = typename std::iterator_traits<Iter>::value_type;
+  using value_type = T;
 
   using reference = value_type &;
 
   using const_reference = const reference;
 
-  using iterator = Iter;
+  using iterator = ForeignForwardIterator<T>;
 
   using const_iterator = const iterator;
 
-  using difference_type = typename std::iterator_traits<Iter>::difference_type;
+  using difference_type =
+      typename std::iterator_traits<iterator>::difference_type;
 
-  using size_type = SizeType;
+  using size_type = S;
 
   virtual ~ForeignContainer() = default;
 
-  virtual iterator begin() = 0;
+  iterator begin();
 
-  virtual iterator end() = 0;
+  iterator end();
 
-  virtual const_iterator begin() const = 0;
+  const_iterator begin() const;
 
-  virtual const_iterator end() const = 0;
+  const_iterator end() const;
 
-  virtual const_iterator cbegin() const = 0;
+  const_iterator cbegin() const;
 
-  virtual const_iterator cend() const = 0;
+  const_iterator cend() const;
 
-  virtual size_type size() const = 0;
+  size_type size() const;
 
-  virtual size_type max_size() const = 0;
+  size_type max_size() const;
 
-  virtual bool empty() const = 0;
+  bool empty() const;
 
   /**
-   *  @brief Pointer to the array of foreign objects.
+   *  @brief Data of the pointer to the foreign array.
    */
-  virtual CMultiArray ptr() const = 0;
+  virtual COpaqueContainer container() const = 0;
 };
 
 } // namespace interop
 } // namespace tanuki
+
+#include "tanuki/interop/foreign_container.hxx"
 
 #endif

@@ -7,6 +7,7 @@ list(
   tanuki/interop/c_opaque_container.h
   tanuki/interop/c_poly_pointer.h
   tanuki/interop/foreign_container.h
+  tanuki/interop/foreign_container_ref.h
   tanuki/interop/foreign_forward_iterator.h
   tanuki/interop/foreign_forwarder.h
   tanuki/interop/foreign_pointer.h
