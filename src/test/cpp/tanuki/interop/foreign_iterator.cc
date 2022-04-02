@@ -15,7 +15,7 @@ using std::string;
 using std::uniform_int_distribution;
 using std::vector;
 
-using tanuki::interop::ForeignForwardIterator;
+using tanuki::interop::ForeignIterator;
 
 /**
  *  @brief Mock data class for foreign elements.
@@ -41,9 +41,9 @@ struct ForeignElementMockDecorator final {
 };
 
 /**
- *  @brief Tests @link ForeignForwardIterator @endlink.
+ *  @brief Tests @link ForeignIterator @endlink.
  */
-TEST(ForeignForwardIteratorTest, ForeignForwardIteratorAccess) {
+TEST(ForeignIteratorTest, ForeignIteratorAccess) {
   std::random_device rd;
   std::mt19937 gen(rd());
 
@@ -69,9 +69,9 @@ TEST(ForeignForwardIteratorTest, ForeignForwardIteratorAccess) {
   };
 
   // Create foreign iterators to the decorated mock elements.
-  ForeignForwardIterator<ForeignElementMockDecorator> output_begin_it(
+  ForeignIterator<ForeignElementMockDecorator> output_begin_it(
       foreign_elems_ctnr, 0);
-  ForeignForwardIterator<ForeignElementMockDecorator> output_end_it(
+  ForeignIterator<ForeignElementMockDecorator> output_end_it(
       foreign_elems_ctnr, foreign_elems.size());
 
   // Test the distance from the beginning iterator to the end iterator.

@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <iterator>
 
-#include "tanuki/interop/foreign_forward_iterator.h"
+#include "tanuki/interop/foreign_iterator.h"
 
 namespace tanuki {
 namespace interop {
@@ -14,8 +14,8 @@ namespace interop {
  *  requirement for wrapping a foreign array of opaque elements.
  *
  *  @tparam T
- *    Type of decorated elements being iterated over. See @link
- *    ForeignForwardIterator @endlink for the requirements.
+ *    Type of decorated elements being iterated over. See @link ForeignIterator
+ *    @endlink for the requirements.
  *
  *  @tparam S
  *    <tt>size_type</tt> in the <tt>Container</tt> named requirement.
@@ -29,7 +29,7 @@ class ForeignContainer {
 
   using const_reference = const reference;
 
-  using iterator = ForeignForwardIterator<T>;
+  using iterator = ForeignIterator<T>;
 
   using const_iterator = const iterator;
 

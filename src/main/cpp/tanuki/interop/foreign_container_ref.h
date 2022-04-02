@@ -13,8 +13,8 @@ namespace interop {
  *  one from the other instance. The foreign array itself is not copied.
  *
  *  @tparam T
- *    Type of decorated elements being iterated over. See @link
- *    ForeignForwardIterator @endlink for the requirements.
+ *    Type of decorated elements being iterated over. See @link ForeignIterator
+ *    @endlink for the requirements.
  *
  *  @tparam S
  *    <tt>size_type</tt> in the <tt>Container</tt> named requirement.

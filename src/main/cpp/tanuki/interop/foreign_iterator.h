@@ -1,5 +1,5 @@
-#ifndef TANUKI_INTEROP_FOREIGN_FORWARD_ITERATOR_H
-#define TANUKI_INTEROP_FOREIGN_FORWARD_ITERATOR_H
+#ifndef TANUKI_INTEROP_FOREIGN_ITERATOR_H
+#define TANUKI_INTEROP_FOREIGN_ITERATOR_H
 
 #include <cstddef>
 #include <iterator>
@@ -10,8 +10,7 @@ namespace tanuki {
 namespace interop {
 
 /**
- *  @brief <tt>LegacyForwardIterator</tt> over decorated opaque items of
- *  constant size.
+ *  @brief Iterator over decorated opaque items of constant size.
  *
  *  @tparam T
  *    Type of decorated items being iterated over. It must
@@ -25,7 +24,7 @@ namespace interop {
  *    <tt>std::iterator_traits::difference_type</tt>.
  */
 template <typename T, typename D = long>
-class ForeignForwardIterator final {
+class ForeignIterator final {
  public:
   using iterator_category = std::forward_iterator_tag;
 
@@ -37,7 +36,7 @@ class ForeignForwardIterator final {
 
   using difference_type = D;
 
-  ForeignForwardIterator() = default;
+  ForeignIterator() = default;
 
   /**
    *  @param container
@@ -48,17 +47,17 @@ class ForeignForwardIterator final {
    *    number of items, inclusive, where the latter represents the end
    *    iterator.
    */
-  ForeignForwardIterator(const COpaqueContainer &container, size_t index);
+  ForeignIterator(const COpaqueContainer &container, size_t index);
 
-  ForeignForwardIterator(const ForeignForwardIterator<T, D> &other);
+  ForeignIterator(const ForeignIterator<T, D> &other);
 
-  ForeignForwardIterator &operator=(const ForeignForwardIterator<T, D> &other);
+  ForeignIterator &operator=(const ForeignIterator<T, D> &other);
 
-  ~ForeignForwardIterator();
+  ~ForeignIterator();
 
-  bool operator==(const ForeignForwardIterator<T, D> &other) const;
+  bool operator==(const ForeignIterator<T, D> &other) const;
 
-  bool operator!=(const ForeignForwardIterator<T, D> &other) const;
+  bool operator!=(const ForeignIterator<T, D> &other) const;
 
   reference operator*();
 
@@ -66,11 +65,11 @@ class ForeignForwardIterator final {
 
   pointer operator->() const;
 
-  ForeignForwardIterator<T, D> &operator++();
+  ForeignIterator<T, D> &operator++();
 
-  ForeignForwardIterator<T, D> operator++(int);
+  ForeignIterator<T, D> operator++(int);
 
-  void swap(ForeignForwardIterator<T, D> &other);
+  void swap(ForeignIterator<T, D> &other);
 
  private:
   /**
@@ -91,11 +90,11 @@ class ForeignForwardIterator final {
 };
 
 template <typename T, typename D>
-void swap(ForeignForwardIterator<T, D> &a, ForeignForwardIterator<T, D> &b);
+void swap(ForeignIterator<T, D> &a, ForeignIterator<T, D> &b);
 
 } // namespace interop
 } // namespace tanuki
 
-#include "tanuki/interop/foreign_forward_iterator.hxx"
+#include "tanuki/interop/foreign_iterator.hxx"
 
 #endif

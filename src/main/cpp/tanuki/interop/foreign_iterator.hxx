@@ -1,5 +1,5 @@
-#ifndef TANUKI_INTEROP_FOREIGN_FORWARD_ITERATOR_HXX
-#define TANUKI_INTEROP_FOREIGN_FORWARD_ITERATOR_HXX
+#ifndef TANUKI_INTEROP_FOREIGN_ITERATOR_HXX
+#define TANUKI_INTEROP_FOREIGN_ITERATOR_HXX
 
 #include <cassert>
 #include <cstdlib>
@@ -12,7 +12,7 @@ namespace tanuki {
 namespace interop {
 
 template <typename T, typename D>
-ForeignForwardIterator<T, D>::ForeignForwardIterator(
+ForeignIterator<T, D>::ForeignIterator(
     const COpaqueContainer &container, size_t index)
         : container_(container),
           index_(index) {
@@ -27,10 +27,9 @@ ForeignForwardIterator<T, D>::ForeignForwardIterator(
 }
 
 template <typename T, typename D>
-ForeignForwardIterator<T, D>::ForeignForwardIterator(
-    const ForeignForwardIterator<T, D> &other)
-        : container_(other.container_),
-          index_(other.index_) {
+ForeignIterator<T, D>::ForeignIterator(const ForeignIterator<T, D> &other)
+    : container_(other.container_),
+      index_(other.index_) {
   if (index_ != this->container_.arr.num_elems) {
     this->item_ = static_cast<pointer>(std::malloc(sizeof(value_type)));
     if (this->item_ == nullptr) {
@@ -43,17 +42,17 @@ ForeignForwardIterator<T, D>::ForeignForwardIterator(
 }
 
 template <typename T, typename D>
-ForeignForwardIterator<T, D> &ForeignForwardIterator<T, D>::operator=(
-    const ForeignForwardIterator<T, D> &other) {
+ForeignIterator<T, D> &ForeignIterator<T, D>::operator=(
+    const ForeignIterator<T, D> &other) {
   if (this == &other) {
     return *this;
   }
 
-  new(this) ForeignForwardIterator(other);
+  new(this) ForeignIterator(other);
 }
 
 template <typename T, typename D>
-ForeignForwardIterator<T, D>::~ForeignForwardIterator() {
+ForeignIterator<T, D>::~ForeignIterator() {
   if (item_ != nullptr) {
     item_->~value_type();
     std::free(item_);
@@ -61,36 +60,36 @@ ForeignForwardIterator<T, D>::~ForeignForwardIterator() {
 }
 
 template <typename T, typename D>
-bool ForeignForwardIterator<T, D>::operator==(
-    const ForeignForwardIterator<T, D> &other) const {
+bool ForeignIterator<T, D>::operator==(
+    const ForeignIterator<T, D> &other) const {
   return container_.arr.ptr == other.container_.arr.ptr &&
       container_.elem_size == other.container_.elem_size &&
       index_ == other.index_;
 }
 
 template <typename T, typename D>
-bool ForeignForwardIterator<T, D>::operator!=(
-    const ForeignForwardIterator<T, D> &other) const {
+bool ForeignIterator<T, D>::operator!=(
+    const ForeignIterator<T, D> &other) const {
   return !(*this == other);
 }
 
 template <typename T, typename D>
-auto ForeignForwardIterator<T, D>::operator*() -> reference {
+auto ForeignIterator<T, D>::operator*() -> reference {
   return *item_;
 }
 
 template <typename T, typename D>
-auto ForeignForwardIterator<T, D>::operator*() const -> const reference {
+auto ForeignIterator<T, D>::operator*() const -> const reference {
   return const_cast<const reference>(*item_);
 }
 
 template <typename T, typename D>
-auto ForeignForwardIterator<T, D>::operator->() const -> pointer {
+auto ForeignIterator<T, D>::operator->() const -> pointer {
   return &operator*();
 }
 
 template <typename T, typename D>
-ForeignForwardIterator<T, D> &ForeignForwardIterator<T, D>::operator++() {
+ForeignIterator<T, D> &ForeignIterator<T, D>::operator++() {
   assert(item_);
 
   ++index_;
@@ -109,7 +108,7 @@ ForeignForwardIterator<T, D> &ForeignForwardIterator<T, D>::operator++() {
 }
 
 template <typename T, typename D>
-ForeignForwardIterator<T, D> ForeignForwardIterator<T, D>::operator++(int) {
+ForeignIterator<T, D> ForeignIterator<T, D>::operator++(int) {
   auto old = *this;
   operator++();
 
@@ -117,7 +116,7 @@ ForeignForwardIterator<T, D> ForeignForwardIterator<T, D>::operator++(int) {
 }
 
 template <typename T, typename D>
-void ForeignForwardIterator<T, D>::swap(ForeignForwardIterator<T, D> &other) {
+void ForeignIterator<T, D>::swap(ForeignIterator<T, D> &other) {
   if (this == &other) {
     return;
   }
@@ -128,7 +127,7 @@ void ForeignForwardIterator<T, D>::swap(ForeignForwardIterator<T, D> &other) {
 }
 
 template <typename T, typename D>
-void swap(ForeignForwardIterator<T, D> &a, ForeignForwardIterator<T, D> &b) {
+void swap(ForeignIterator<T, D> &a, ForeignIterator<T, D> &b) {
   a.swap(b);
 }
 

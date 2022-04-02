@@ -16,7 +16,6 @@ using std::uniform_int_distribution;
 using std::vector;
 
 using tanuki::interop::ForeignContainerRef;
-using tanuki::interop::ForeignForwardIterator;
 
 /**
  *  @brief Mock data class for foreign elements.
