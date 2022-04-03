@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <iterator>
 
-#include "tanuki/interop/c_opaque_container.h"
+#include "tanuki/interop/c_sequence.h"
 
 namespace tanuki {
 namespace interop {
@@ -39,15 +39,15 @@ class ForeignIterator final {
   ForeignIterator() = default;
 
   /**
-   *  @param container
-   *    Opaque foreign container.
+   *  @param seq
+   *    Foreign sequence.
    *
    *  @param index
    *    Zero-based index of the item. Valid index ranges from zero to the
    *    number of items, inclusive, where the latter represents the end
    *    iterator.
    */
-  ForeignIterator(const COpaqueContainer &container, size_t index);
+  ForeignIterator(CSequence seq, size_t index);
 
   ForeignIterator(const ForeignIterator<T, D> &other);
 
@@ -73,9 +73,9 @@ class ForeignIterator final {
 
  private:
   /**
-   *  @brief Opaque foreign container.
+   *  @brief Foreign sequence.
    */
-  COpaqueContainer container_;
+  CSequence seq_;
 
   /**
    *  @brief Zero-based index of the item.

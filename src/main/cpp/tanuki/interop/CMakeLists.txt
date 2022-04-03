@@ -4,7 +4,6 @@ list(
 
   tanuki/interop/c_complex_number.h
   tanuki/interop/c_multi_array.h
-  tanuki/interop/c_opaque_container.h
   tanuki/interop/c_poly_pointer.h
   tanuki/interop/c_sequence.h
   tanuki/interop/foreign_container.h

@@ -60,19 +60,17 @@ TEST(ForeignIteratorTest, ForeignIteratorAccess) {
         [&gen]() -> int { return uniform_int_distribution<>(-32, 32)(gen); });
   }
 
-  COpaqueContainer foreign_elems_ctnr = {
-    .arr = {
-      .num_elems = foreign_elems.size(),
-      .ptr = foreign_elems.data()
-    },
-    .elem_size = sizeof(ForeignElementMock)
+  CSequence foreign_elems_seq = {
+    .begin = foreign_elems.data(),
+    .num_items = foreign_elems.size(),
+    .item_size = sizeof(ForeignElementMock)
   };
 
   // Create foreign iterators to the decorated mock elements.
   ForeignIterator<ForeignElementMockDecorator> output_begin_it(
-      foreign_elems_ctnr, 0);
+      foreign_elems_seq, 0);
   ForeignIterator<ForeignElementMockDecorator> output_end_it(
-      foreign_elems_ctnr, foreign_elems.size());
+      foreign_elems_seq, foreign_elems.size());
 
   // Test the distance from the beginning iterator to the end iterator.
   ASSERT_EQ(

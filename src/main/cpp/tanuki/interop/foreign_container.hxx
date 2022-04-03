@@ -8,37 +8,37 @@ namespace interop {
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::begin() -> iterator {
-  return iterator(container(), 0);
+  return iterator(seq(), 0);
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::end() -> iterator {
-  return iterator(container(), size());
+  return iterator(seq(), size());
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::begin() const -> const_iterator {
-  return iterator(container(), 0);
+  return iterator(seq(), 0);
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::end() const -> const_iterator {
-  return iterator(container(), size());
+  return iterator(seq(), size());
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::cbegin() const -> const_iterator {
-  return iterator(container(), 0);
+  return iterator(seq(), 0);
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::cend() const -> const_iterator {
-  return iterator(container(), size());
+  return iterator(seq(), size());
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::size() const -> size_type {
-  return container().arr.num_elems;
+  return seq().num_items;
 }
 
 template <typename T, typename S>

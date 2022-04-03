@@ -4,23 +4,46 @@
 #include <cstddef>
 
 /**
- *  @brief Data structure for passing an array of elements with foreign
- *  languages.
- *
- *  It is the one-dimensional case of @link CMultiArray @endlink.
+ *  @brief Data structure for passing a foreign sequence where each item has
+ *  the same size.
  */
 extern "C"
 typedef struct {
  public:
   /**
-   *  @brief Number of elements.
+   *  @brief Pointer to the beginning of the sequence.
    */
-  size_t num_elems;
+  void *begin;
 
   /**
-   *  @brief Pointer to the beginning of the array.
+   *  @brief Number of items in the sequence.
    */
-  void *ptr;
+  size_t num_items;
+
+  /**
+   *  @brief Size in bytes of each item.
+   */
+  size_t item_size;
 } CSequence;
+
+/**
+ *  @brief Copies @link CSequence @endlink to a new location.
+ *
+ *  @tparam OutputIt
+ *    Must meet the requirements of <tt>LegacyOutputIterator</tt>.
+ *
+ *  @param src
+ *    @link CSequence @endlink to copy.
+ *
+ *  @param dst
+ *    Beginning of the destination range.
+ *
+ *  @return
+ *    Iterator to past-the-end element in the destination range.
+ */
+template <typename OutputIt>
+OutputIt Copy(const CSequence &src, OutputIt dst);
+
+#include "tanuki/interop/c_sequence.hxx"
 
 #endif

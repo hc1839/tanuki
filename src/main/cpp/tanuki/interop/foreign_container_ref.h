@@ -1,6 +1,7 @@
 #ifndef TANUKI_INTEROP_FOREIGN_CONTAINER_REF_H
 #define TANUKI_INTEROP_FOREIGN_CONTAINER_REF_H
 
+#include "tanuki/interop/c_sequence.h"
 #include "tanuki/interop/foreign_container.h"
 
 namespace tanuki {
@@ -13,7 +14,7 @@ namespace interop {
  *  one from the other instance. The foreign array itself is not copied.
  *
  *  @tparam T
- *    Type of decorated elements being iterated over. See @link ForeignIterator
+ *    Type of decorated items being iterated over. See @link ForeignIterator
  *    @endlink for the requirements.
  *
  *  @tparam S
@@ -25,22 +26,22 @@ class ForeignContainerRef final : public ForeignContainer<T, S> {
   ForeignContainerRef() = default;
 
   /**
-   *  @param container
-   *    Data of the pointer to the foreign array.
+   *  @param seq
+   *    Foreign sequence.
    */
-  ForeignContainerRef(const COpaqueContainer &container);
+  ForeignContainerRef(CSequence seq);
 
   virtual ~ForeignContainerRef() = default;
 
   void swap(ForeignContainerRef &other);
 
-  COpaqueContainer container() const override final;
+  CSequence seq() const override final;
 
  private:
   /**
-   *  @brief Backing data member for @link container @endlink.
+   *  @brief Backing data member for @link seq @endlink.
    */
-  COpaqueContainer container_;
+  CSequence seq_;
 };
 
 template <typename T, typename S>

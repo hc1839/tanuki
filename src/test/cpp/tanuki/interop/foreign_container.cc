@@ -66,17 +66,15 @@ TEST(ForeignContainerTest, ForeignContainerAccess) {
         [&gen]() -> int { return uniform_int_distribution<>(-32, 32)(gen); });
   }
 
-  COpaqueContainer foreign_elems_ctnr = {
-    .arr = {
-      .num_elems = foreign_elems.size(),
-      .ptr = foreign_elems.data()
-    },
-    .elem_size = sizeof(ForeignElementMock)
+  CSequence foreign_elems_seq = {
+    .begin = foreign_elems.data(),
+    .num_items = foreign_elems.size(),
+    .item_size = sizeof(ForeignElementMock)
   };
 
   // Create the mock foreign container.
   ForeignContainerRef<ForeignElementMockDecorator> foreign_container(
-      foreign_elems_ctnr);
+      foreign_elems_seq);
 
   // Test the size of the container.
   ASSERT_EQ(foreign_container.size(), NUM_FOREIGN_ELEMS);

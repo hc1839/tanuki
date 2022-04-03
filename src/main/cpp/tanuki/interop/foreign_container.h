@@ -11,10 +11,10 @@ namespace interop {
 
 /**
  *  @brief Container that partially satisfies C++ <tt>Container</tt> named
- *  requirement for wrapping a foreign array of opaque elements.
+ *  requirement for wrapping a foreign array of opaque items.
  *
  *  @tparam T
- *    Type of decorated elements being iterated over. See @link ForeignIterator
+ *    Type of decorated items being iterated over. See @link ForeignIterator
  *    @endlink for the requirements.
  *
  *  @tparam S
@@ -59,9 +59,9 @@ class ForeignContainer {
   bool empty() const;
 
   /**
-   *  @brief Data of the pointer to the foreign array.
+   *  @brief Foreign sequence backing <tt>this</tt> container.
    */
-  virtual COpaqueContainer container() const = 0;
+  virtual CSequence seq() const = 0;
 };
 
 } // namespace interop

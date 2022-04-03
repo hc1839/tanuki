@@ -9,9 +9,8 @@ namespace tanuki {
 namespace interop {
 
 template <typename T, typename S>
-ForeignContainerRef<T, S>::ForeignContainerRef(
-    const COpaqueContainer &container)
-        : container_(container) {}
+ForeignContainerRef<T, S>::ForeignContainerRef(CSequence seq)
+    : seq_(seq) {}
 
 template <typename T, typename S>
 void ForeignContainerRef<T, S>::swap(ForeignContainerRef &other) {
@@ -19,12 +18,12 @@ void ForeignContainerRef<T, S>::swap(ForeignContainerRef &other) {
     return;
   }
 
-  std::swap(container_, other.container_);
+  std::swap(seq_, other.seq_);
 }
 
 template <typename T, typename S>
-COpaqueContainer ForeignContainerRef<T, S>::container() const {
-  return container_;
+CSequence ForeignContainerRef<T, S>::seq() const {
+  return seq_;
 }
 
 template <typename T, typename S>
