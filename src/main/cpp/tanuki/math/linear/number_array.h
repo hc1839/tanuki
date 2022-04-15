@@ -172,56 +172,6 @@ template <
         bool>::type = true>
 void Convert(const NumberArray &src, OutputIt d_first);
 
-/**
- *  @brief Custom conversions with @link NumberArray @endlink that is called by
- *  @link EncodeToNumberArray @endlink and @link DecodeFromNumberArray
- *  @endlink.
- *
- *  @tparam T
- *    Type being converted.
- */
-template <typename T>
-struct NumberArrayConvert final {
- public:
-  /**
-   *  @brief Converts to @link NumberArray @endlink.
-   *
-   *  It is called by @link EncodeToNumberArray @endlink.
-   */
-  static void Encode(NumberArray &e, const T &o);
-
-  /**
-   *  @brief Converts from @link NumberArray @endlink.
-   *
-   *  It is called by @link DecodeFromNumberArray @endlink.
-   */
-  static void Decode(const NumberArray &e, T &o);
-};
-
-/**
- *  @brief Converts to @link NumberArray @endlink.
- *
- *  To implement custom conversion from a type, define @link
- *  NumberArrayConvert::Encode @endlink.
- *
- *  @tparam T
- *    Type being converted from.
- */
-template <typename T>
-void EncodeToNumberArray(NumberArray &e, const T &o);
-
-/**
- *  @brief Converts from @link NumberArray @endlink.
- *
- *  To implement custom conversion to a type, define @link
- *  NumberArrayConvert::Decode @endlink.
- *
- *  @tparam T
- *    Type being converted to.
- */
-template <typename T>
-void DecodeFromNumberArray(const NumberArray &d, T &o);
-
 } // namespace linear
 } // namespace math
 } // namespace tanuki

@@ -104,16 +104,6 @@ void Convert(const NumberArray &src, OutputIt d_first) {
   }
 }
 
-template <typename T>
-void EncodeToNumberArray(NumberArray &e, const T &o) {
-  NumberArrayConvert<T>::Encode(e, o);
-}
-
-template <typename T>
-void DecodeFromNumberArray(const NumberArray &d, T &o) {
-  NumberArrayConvert<T>::Decode(d, o);
-}
-
 } // namespace linear
 } // namespace math
 } // namespace tanuki
