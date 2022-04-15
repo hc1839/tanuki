@@ -19,7 +19,7 @@
     },
     {
       "name": "real",
-      "doc": "Real part of the array in column-major order.",
+      "doc": "Real part of the array.",
       "type": {
         "type": "array",
         "items": "@TANUKI_REAL_T@"
@@ -27,7 +27,7 @@
     },
     {
       "name": "imag",
-      "doc": "Imaginary part of the array in column-major order. It is not used if `is_complex` is `false`.",
+      "doc": "Imaginary part of the array. It is not used if `is_complex` is `false`.",
       "type": {
         "type": "array",
         "items": "@TANUKI_REAL_T@"
