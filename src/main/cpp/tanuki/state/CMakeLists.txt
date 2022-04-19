@@ -9,6 +9,7 @@ list(
   HDRS
 
   tanuki/state/spin.h
+  tanuki/state/spin_range.h
 )
 
 list(
