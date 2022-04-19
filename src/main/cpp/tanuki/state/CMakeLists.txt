@@ -10,6 +10,7 @@ list(
 
   tanuki/state/spin.h
   tanuki/state/spin_range.h
+  tanuki/state/spin_range_transformer.h
 )
 
 list(
