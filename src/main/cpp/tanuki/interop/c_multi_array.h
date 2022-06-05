@@ -4,12 +4,19 @@
 #include <cstddef>
 #include <vector>
 
+#include "tanuki/interop/c_sequence.h"
+
 /**
- *  @brief Data structure for passing a multidimensional array of elements with
+ *  @brief Data structure for passing a multidimensional array of items with
  *  foreign languages.
  */
 extern "C"
 typedef struct {
+  /**
+   *  @brief Pointer to the beginning of the array.
+   */
+  void *begin;
+
   /**
    *  @brief Number of dimensions of the array.
    */
@@ -22,10 +29,9 @@ typedef struct {
   size_t *extents;
 
   /**
-   *  @brief Pointer to the beginning of the array, or <tt>nullptr</tt> if the
-   *  array is empty.
+   *  @brief Size in bytes of each item.
    */
-  void *ptr;
+  size_t item_size;
 
   /**
    *  @brief Copy of @link extents @endlink as an <tt>std::vector</tt>
@@ -34,9 +40,10 @@ typedef struct {
   std::vector<size_t> shape() const;
 
   /**
-   *  @brief Number of elements determined from @link shape @endlink only.
+   *  @brief Number of items in the array determined from @link shape @endlink
+   *  only.
    */
-  size_t num_elems() const;
+  size_t num_items() const;
 } CMultiArray;
 
 /**

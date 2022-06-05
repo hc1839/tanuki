@@ -6,7 +6,7 @@ std::vector<size_t> CMultiArray::shape() const {
   return std::vector<size_t>(extents, extents + num_dims);
 }
 
-size_t CMultiArray::num_elems() const {
+size_t CMultiArray::num_items() const {
   const auto extents_vec = shape();
 
   return std::accumulate(

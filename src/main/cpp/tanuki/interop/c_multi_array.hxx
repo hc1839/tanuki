@@ -10,8 +10,8 @@ OutputIt Copy(const CMultiArray &src, OutputIt dst) {
   using T = typename std::iterator_traits<OutputIt>::value_type;
 
   std::copy(
-      static_cast<T *>(src.ptr),
-      static_cast<T *>(src.ptr) + src.num_elems(),
+      static_cast<T *>(src.begin),
+      static_cast<T *>(src.begin) + src.num_items(),
       dst);
 
   return dst;
