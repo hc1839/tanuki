@@ -5,6 +5,7 @@
 #include <iterator>
 #include <random>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -12,6 +13,7 @@
 #define NUM_FOREIGN_ELEMS 8
 
 using std::string;
+using std::swap;
 using std::uniform_int_distribution;
 using std::vector;
 
@@ -60,7 +62,7 @@ TEST(ForeignIteratorTest, ForeignIteratorAccess) {
         [&gen]() -> int { return uniform_int_distribution<>(-32, 32)(gen); });
   }
 
-  CSequence foreign_elems_seq = {
+  const CSequence seq = {
     .begin = foreign_elems.data(),
     .num_items = foreign_elems.size(),
     .item_size = sizeof(ForeignElementMock)
@@ -68,9 +70,14 @@ TEST(ForeignIteratorTest, ForeignIteratorAccess) {
 
   // Create foreign iterators to the decorated mock elements.
   ForeignIterator<ForeignElementMockDecorator> output_begin_it(
-      foreign_elems_seq, 0);
+      seq.begin, seq.item_size);
   ForeignIterator<ForeignElementMockDecorator> output_end_it(
-      foreign_elems_seq, foreign_elems.size());
+      static_cast<char *>(seq.begin) + seq.item_size * seq.num_items,
+      seq.item_size);
+
+  // Test the swapping of two iterators.
+  swap(output_begin_it, output_end_it);
+  swap(output_begin_it, output_end_it);
 
   // Test the distance from the beginning iterator to the end iterator.
   ASSERT_EQ(
@@ -84,6 +91,21 @@ TEST(ForeignIteratorTest, ForeignIteratorAccess) {
     for (auto output_it = output_begin_it;
          output_it != output_end_it;
          ++output_it, ++input_it) {
+      ASSERT_EQ(*input_it, *output_it->receiver);
+    }
+  }
+
+  // Test reverse iteration over the mock foreign elements using the foreign
+  // iterators.
+  {
+    // Iterator to the mock foreign elements stored in the original sequence.
+    auto input_it = foreign_elems.end();
+    auto output_it = output_end_it;
+
+    while (output_it != output_begin_it) {
+      --input_it;
+      --output_it;
+
       ASSERT_EQ(*input_it, *output_it->receiver);
     }
   }

@@ -2,23 +2,31 @@
 #define TANUKI_INTEROP_FOREIGN_ITERATOR_H
 
 #include <cstddef>
+#include <functional>
 #include <iterator>
+#include <memory>
 
 #include "tanuki/interop/c_sequence.h"
 
 namespace tanuki {
 namespace interop {
 
+using std::function;
+using std::unique_ptr;
+
 /**
  *  @brief Iterator over decorated opaque items of constant size.
  *
  *  @tparam T
- *    Type of decorated items being iterated over. It must
+ *    Type of decorated opaque items being iterated over. It must
  *      - have a constructor, <tt>T(void *)</tt>, that wraps the given pointer
  *        to the opaque item,
- *      - not take ownership of the opaque pointer,
- *      - maintain the same opaque pointer throughout its lifetime, and
- *      - meet the requirements of <tt>Destructible</tt>.
+ *      - meet the requirements of <tt>CopyConstructible</tt> without copying
+ *        the opaque item,
+ *      - meet the requirements of <tt>Destructible</tt> without deleting the
+ *        opaque item,
+ *      - not take ownership of the pointer, and
+ *      - maintain the same pointer throughout its lifetime.
  *
  *  @tparam D
  *    <tt>std::iterator_traits::difference_type</tt>.
@@ -26,7 +34,7 @@ namespace interop {
 template <typename T, typename D = long>
 class ForeignIterator final {
  public:
-  using iterator_category = std::forward_iterator_tag;
+  using iterator_category = std::bidirectional_iterator_tag;
 
   using value_type = T;
 
@@ -39,29 +47,24 @@ class ForeignIterator final {
   ForeignIterator() = default;
 
   /**
-   *  @param seq
-   *    Foreign sequence.
+   *  @param ptr
+   *    Pointer to the opaque item.
    *
-   *  @param index
-   *    Zero-based index of the item. Valid index ranges from zero to the
-   *    number of items, inclusive, where the latter represents the end
-   *    iterator.
+   *  @param item_size
+   *    Size in bytes of each item in the range that the item pointed by
+   *    <tt>ptr</tt> is in.
    */
-  ForeignIterator(CSequence seq, size_t index);
+  ForeignIterator(void *ptr, size_t item_size);
 
   ForeignIterator(const ForeignIterator<T, D> &other);
 
   ForeignIterator &operator=(const ForeignIterator<T, D> &other);
 
-  ~ForeignIterator();
+  bool operator==(const ForeignIterator<T, D> &rhs) const;
 
-  bool operator==(const ForeignIterator<T, D> &other) const;
+  bool operator!=(const ForeignIterator<T, D> &rhs) const;
 
-  bool operator!=(const ForeignIterator<T, D> &other) const;
-
-  reference operator*();
-
-  const reference operator*() const;
+  value_type operator*() const;
 
   pointer operator->() const;
 
@@ -69,24 +72,30 @@ class ForeignIterator final {
 
   ForeignIterator<T, D> operator++(int);
 
+  ForeignIterator<T, D> &operator--();
+
+  ForeignIterator<T, D> operator--(int);
+
   void swap(ForeignIterator<T, D> &other);
 
  private:
-  /**
-   *  @brief Foreign sequence.
-   */
-  CSequence seq_;
+  using DecoratorDeleter = function<void(pointer)>;
 
   /**
-   *  @brief Zero-based index of the item.
+   *  @brief Pointer to the opaque item.
    */
-  size_t index_;
+  void *ptr_;
 
   /**
-   *  @brief Placeholder for the decorated opaque item, or <tt>nullptr</tt> if
-   *  <tt>this</tt> is an end iterator.
+   *  @brief Size in bytes of each item in the range that the item pointed by
+   *  @link ptr_ @endlink is in.
    */
-  pointer item_ = nullptr;
+  size_t item_size_;
+
+  /**
+   *  @brief Decorated opaque item.
+   */
+  unique_ptr<value_type, DecoratorDeleter> item_;
 };
 
 template <typename T, typename D>

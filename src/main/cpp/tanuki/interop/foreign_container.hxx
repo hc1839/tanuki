@@ -8,32 +8,38 @@ namespace interop {
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::begin() -> iterator {
-  return iterator(seq(), 0);
+  return iterator(seq().begin, seq().item_size);
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::end() -> iterator {
-  return iterator(seq(), size());
+  return iterator(
+      static_cast<char *>(seq().begin) + seq().item_size * seq().num_items,
+      seq().item_size);
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::begin() const -> const_iterator {
-  return iterator(seq(), 0);
+  return iterator(seq().begin, seq().item_size);
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::end() const -> const_iterator {
-  return iterator(seq(), size());
+  return iterator(
+      static_cast<char *>(seq().begin) + seq().item_size * seq().num_items,
+      seq().item_size);
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::cbegin() const -> const_iterator {
-  return iterator(seq(), 0);
+  return iterator(seq().begin, seq().item_size);
 }
 
 template <typename T, typename S>
 auto ForeignContainer<T, S>::cend() const -> const_iterator {
-  return iterator(seq(), size());
+  return iterator(
+      static_cast<char *>(seq().begin) + seq().item_size * seq().num_items,
+      seq().item_size);
 }
 
 template <typename T, typename S>
