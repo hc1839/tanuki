@@ -70,9 +70,10 @@ TEST(ForeignIteratorTest, ForeignIteratorAccess) {
 
   // Create foreign iterators to the decorated mock elements.
   ForeignIterator<ForeignElementMockDecorator> output_begin_it(
-      seq.begin, seq.item_size);
+      seq.begin, 0, seq.item_size);
   ForeignIterator<ForeignElementMockDecorator> output_end_it(
       static_cast<char *>(seq.begin) + seq.item_size * seq.num_items,
+      seq.num_items,
       seq.item_size);
 
   // Test the swapping of two iterators.
@@ -109,4 +110,18 @@ TEST(ForeignIteratorTest, ForeignIteratorAccess) {
       ASSERT_EQ(*input_it, *output_it->receiver);
     }
   }
+
+  // Test random access of the mock foreign elements using the foreign
+  // iterators.
+  {
+    auto input_begin_it = foreign_elems.begin();
+
+    for (size_t i = 0; i != foreign_elems.size(); ++i) {
+      ASSERT_EQ(input_begin_it[i], *output_begin_it[i].receiver);
+    }
+  }
+
+  // Test comparison of foreign iterators.
+  ASSERT_LE(output_begin_it, output_end_it);
+  ASSERT_GE(output_end_it, output_begin_it);
 }

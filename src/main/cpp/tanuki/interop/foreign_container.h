@@ -40,6 +40,8 @@ class ForeignContainer {
 
   virtual ~ForeignContainer() = default;
 
+  value_type operator[](size_type idx) const;
+
   iterator begin();
 
   iterator end();
@@ -57,6 +59,12 @@ class ForeignContainer {
   size_type max_size() const;
 
   bool empty() const;
+
+  value_type front() const;
+
+  value_type back() const;
+
+  value_type at(size_type idx) const;
 
   /**
    *  @brief Foreign sequence backing <tt>this</tt> container.

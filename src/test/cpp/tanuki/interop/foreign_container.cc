@@ -92,4 +92,13 @@ TEST(ForeignContainerTest, ForeignContainerAccess) {
       ASSERT_EQ(*input_it++, *output.receiver);
     }
   }
+
+  // Test random access of the mock foreign elements.
+  {
+    auto input_begin_it = foreign_elems.begin();
+
+    for (size_t i = 0; i != foreign_elems.size(); ++i) {
+      ASSERT_EQ(input_begin_it[i], *foreign_container[i].receiver);
+    }
+  }
 }

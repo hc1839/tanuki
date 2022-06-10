@@ -34,7 +34,7 @@ using std::unique_ptr;
 template <typename T, typename D = long>
 class ForeignIterator final {
  public:
-  using iterator_category = std::bidirectional_iterator_tag;
+  using iterator_category = std::random_access_iterator_tag;
 
   using value_type = T;
 
@@ -50,15 +50,22 @@ class ForeignIterator final {
    *  @param ptr
    *    Pointer to the opaque item.
    *
+   *  @param item_index
+   *    Zero-based index of the opaque item.
+   *
    *  @param item_size
    *    Size in bytes of each item in the range that the item pointed by
    *    <tt>ptr</tt> is in.
    */
-  ForeignIterator(void *ptr, size_t item_size);
+  ForeignIterator(void *ptr, size_t item_index, size_t item_size);
 
   ForeignIterator(const ForeignIterator<T, D> &other);
 
   ForeignIterator &operator=(const ForeignIterator<T, D> &other);
+
+  ForeignIterator<T, D> &operator+=(difference_type rhs);
+
+  ForeignIterator<T, D> &operator-=(difference_type rhs);
 
   bool operator==(const ForeignIterator<T, D> &rhs) const;
 
@@ -76,6 +83,12 @@ class ForeignIterator final {
 
   ForeignIterator<T, D> operator--(int);
 
+  ForeignIterator<T, D> operator-(difference_type rhs) const;
+
+  difference_type operator-(const ForeignIterator<T, D> &rhs) const;
+
+  value_type operator[](difference_type idx) const;
+
   void swap(ForeignIterator<T, D> &other);
 
  private:
@@ -85,6 +98,11 @@ class ForeignIterator final {
    *  @brief Pointer to the opaque item.
    */
   void *ptr_;
+
+  /**
+   *  @brief Zero-based index of the opaque item.
+   */
+  size_t item_index_;
 
   /**
    *  @brief Size in bytes of each item in the range that the item pointed by
@@ -97,6 +115,28 @@ class ForeignIterator final {
    */
   unique_ptr<value_type, DecoratorDeleter> item_;
 };
+
+template <typename T, typename D>
+ForeignIterator<T, D> operator+(ForeignIterator<T, D> lhs, D rhs);
+
+template <typename T, typename D>
+ForeignIterator<T, D> operator+(D lhs, ForeignIterator<T, D> rhs);
+
+template <typename T, typename D>
+bool operator<(
+    const ForeignIterator<T, D> &lhs, const ForeignIterator<T, D> &rhs);
+
+template <typename T, typename D>
+bool operator>(
+    const ForeignIterator<T, D> &lhs, const ForeignIterator<T, D> &rhs);
+
+template <typename T, typename D>
+bool operator<=(
+    const ForeignIterator<T, D> &lhs, const ForeignIterator<T, D> &rhs);
+
+template <typename T, typename D>
+bool operator>=(
+    const ForeignIterator<T, D> &lhs, const ForeignIterator<T, D> &rhs);
 
 template <typename T, typename D>
 void swap(ForeignIterator<T, D> &a, ForeignIterator<T, D> &b);
