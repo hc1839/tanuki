@@ -17,6 +17,7 @@ list(
   tanuki/math/linear/matrix_index_pair.h
   tanuki/math/linear/matrix_product.h
   tanuki/math/linear/number_array.h
+  tanuki/math/linear/operator_representation.h
   tanuki/math/linear/qr_decomposition.h
   tanuki/math/linear/rotation_matrix_spec.h
   tanuki/math/linear/triangular_matrix.h
