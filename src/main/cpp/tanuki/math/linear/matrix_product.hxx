@@ -3,20 +3,15 @@
 
 #include <algorithm>
 #include <cassert>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
-#include <omp.h>
-
-#include "tanuki/common/divider/group_delimiter.h"
 #include "tanuki/parallel/mpi/mpi_basic_datatype.h"
 
 namespace tanuki {
 namespace math {
 namespace linear {
 
-using tanuki::common::divider::GroupIndices;
 using tanuki::parallel::mpi::MpiBasicDatatype;
 
 template <typename T>
