@@ -8,6 +8,52 @@
 namespace tanuki {
 namespace interop {
 
+/**
+ *  @brief Internal implementation of @link ForeignContainer @endlink that
+ *  deletes the backing sequence upon destruction.
+ *
+ *  @private
+ */
+template <typename T, typename S = size_t>
+class ForeignContainerImpl final : public ForeignContainer<T, S> {
+ public:
+  virtual ~ForeignContainerImpl() {
+    seq_deleter_(seq_);
+  }
+
+  CSequence seq() const override final {
+    return seq_;
+  }
+
+  friend unique_ptr<ForeignContainer<T, S>> ForeignContainer<T, S>::Create(
+      CSequence, function<void(CSequence)>);
+
+ private:
+  /**
+   *  See @link ForeignContainer::Create @endlink.
+   */
+  ForeignContainerImpl(CSequence seq, function<void(CSequence)> seq_deleter)
+      : seq_(seq),
+        seq_deleter_(seq_deleter) {}
+
+  /**
+   *  @brief Backing data member for @link seq @endlink.
+   */
+  CSequence seq_;
+
+  /**
+   *  @brief Deleter of the backing sequence.
+   */
+  function<void(CSequence)> seq_deleter_;
+};
+
+template <typename T, typename S>
+unique_ptr<ForeignContainer<T, S>> ForeignContainer<T, S>::Create(
+    CSequence seq, function<void(CSequence)> seq_deleter) {
+  return unique_ptr<ForeignContainer<T, S>>(
+      new ForeignContainerImpl<T, S>(seq, seq_deleter));
+}
+
 template <typename T, typename S>
 auto ForeignContainer<T, S>::operator[](size_type idx) const -> value_type {
   return begin()[idx];

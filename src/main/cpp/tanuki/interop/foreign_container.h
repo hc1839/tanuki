@@ -3,11 +3,14 @@
 
 #include <cstddef>
 #include <iterator>
+#include <memory>
 
 #include "tanuki/interop/foreign_iterator.h"
 
 namespace tanuki {
 namespace interop {
+
+using std::unique_ptr;
 
 /**
  *  @brief Container that partially satisfies C++ <tt>Container</tt> named
@@ -37,6 +40,23 @@ class ForeignContainer {
       typename std::iterator_traits<iterator>::difference_type;
 
   using size_type = S;
+
+  /**
+   *  @brief Creates an instance of @link ForeignContainer @endlink with a
+   *  deleter that deletes the backing sequence.
+   *
+   *  @param seq
+   *    Backing sequence to take ownership of.
+   *
+   *  @param seq_deleter
+   *    Deleter that deletes the pointer to the backing sequence
+   *    (<tt>seq.begin</tt>).
+   *
+   *  @return
+   *    Instance of @link ForeignContainer @endlink.
+   */
+  static unique_ptr<ForeignContainer<T, S>> Create(
+      CSequence seq, function<void(CSequence)> seq_deleter);
 
   virtual ~ForeignContainer() = default;
 

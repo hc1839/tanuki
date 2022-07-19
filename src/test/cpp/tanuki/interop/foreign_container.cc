@@ -15,6 +15,7 @@ using std::string;
 using std::uniform_int_distribution;
 using std::vector;
 
+using tanuki::interop::ForeignContainer;
 using tanuki::interop::ForeignContainerRef;
 
 /**
@@ -101,4 +102,37 @@ TEST(ForeignContainerTest, ForeignContainerAccess) {
       ASSERT_EQ(input_begin_it[i], *foreign_container[i].receiver);
     }
   }
+}
+
+/**
+ *  @brief Tests transfer of ownership to @link ForeignContainer @endlink.
+ */
+TEST(ForeignContainerTest, ForeignContainerOwnershipTransfer) {
+  CSequence seq = {
+    new ForeignElementMock[3]{
+      { 2, { 2 } },
+      { 5, { 2, 5 } },
+      { 8, { 2, 5, 8 } }
+    },
+    3,
+    sizeof(ForeignElementMock)
+  };
+
+  auto cntr_ptr = ForeignContainer<ForeignElementMockDecorator>::Create(
+      seq,
+      [](CSequence o) -> void {
+        delete[] static_cast<ForeignElementMock *>(o.begin);
+      });
+
+  auto &cntr = *cntr_ptr;
+  bool is_equal;
+
+  is_equal = *cntr[0].receiver == ForeignElementMock{ 2, { 2 } };
+  ASSERT_TRUE(is_equal);
+
+  is_equal = *cntr[1].receiver == ForeignElementMock{ 5, { 2, 5 } };
+  ASSERT_TRUE(is_equal);
+
+  is_equal = *cntr[2].receiver == ForeignElementMock{ 8, { 2, 5, 8 } };
+  ASSERT_TRUE(is_equal);
 }
