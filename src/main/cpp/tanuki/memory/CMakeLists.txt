@@ -3,6 +3,7 @@ list(
   HDRS
 
   tanuki/memory/smart_ptr.h
+  tanuki/memory/storage_order.h
 )
 
 set(HDRS ${HDRS} PARENT_SCOPE)

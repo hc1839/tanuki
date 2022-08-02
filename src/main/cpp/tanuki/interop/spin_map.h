@@ -6,7 +6,7 @@
 
 #include "tanuki/interop/c_multi_array.h"
 #include "tanuki/interop/c_sequence.h"
-#include "tanuki/interop/foreign_container.h"
+#include "tanuki/interop/foreign_multi_array.h"
 #include "tanuki/state/spin.h"
 
 namespace tanuki {
@@ -127,12 +127,9 @@ map<Spin, T> SpinMapDecorated(const CSequence &seq);
  *  @tparam T
  *    Type of decorated opaque items. It must meet the requirements of the type
  *    of items in @link ForeignContainer @endlink.
- *
- *  @tparam S
- *    <tt>size_type</tt> in the <tt>Container</tt> named requirement.
  */
-template <typename T, typename S>
-map<Spin, T> SpinMapDecorated(const ForeignContainer<T, S> &ctnr);
+template <typename T>
+map<Spin, T> SpinMapDecorated(const ForeignContainer<T> &ctnr);
 
 } // namespace interop
 } // namespace tanuki

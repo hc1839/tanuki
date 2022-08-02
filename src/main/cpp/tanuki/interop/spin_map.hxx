@@ -64,8 +64,8 @@ map<Spin, T> SpinMapDecorated(const CSequence &seq) {
   return retval;
 }
 
-template <typename T, typename S>
-map<Spin, T> SpinMapDecorated(const ForeignContainer<T, S> &ctnr) {
+template <typename T>
+map<Spin, T> SpinMapDecorated(const ForeignContainer<T> &ctnr) {
   return SpinMapDecorated<T>(ctnr.seq());
 }
 
