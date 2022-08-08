@@ -14,6 +14,7 @@ list(
   APPEND
   HDRS
 
+  tanuki/avro_specific/armadillo.h
   tanuki/avro_specific/array.h
   tanuki/avro_specific/map.h
   tanuki/avro_specific/pair.h
