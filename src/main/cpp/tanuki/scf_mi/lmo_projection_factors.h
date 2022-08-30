@@ -1,7 +1,6 @@
 #ifndef TANUKI_SCF_MI_LMO_PROJECTION_FACTORS_H
 #define TANUKI_SCF_MI_LMO_PROJECTION_FACTORS_H
 
-#include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <stdexcept>
@@ -13,6 +12,7 @@
 #include <mpi.h>
 
 #include "tanuki/algorithm/algorithm.h"
+#include "tanuki/math/linear/eigen.h"
 #include "tanuki/math/linear/matrix_product.h"
 #include "tanuki/number/number_cast.h"
 #include "tanuki/number/types.h"
@@ -29,6 +29,7 @@ using arma::uvec;
 using arma::uword;
 
 using tanuki::algorithm::StableIndexSort;
+using tanuki::math::linear::EigSolver;
 using tanuki::math::linear::MatrixProduct;
 using tanuki::number::NumberCast;
 using tanuki::number::complex_t;
@@ -125,6 +126,9 @@ void ScfMiHamiltonians(
  *  @param d_mos_first
  *    Beginning of the destination range of ket matrices of spatial molecular
  *    orbitals in ascending order by energy for each unit.
+ *
+ *  @param eig_solver
+ *    Function that solves a generalized eigenvalue equation.
  */
 template <
     typename T,
@@ -159,7 +163,8 @@ void SolveScfMi(
     InputIt unit_basis_first,
     OutputIt1 d_eff_h_op_first,
     OutputIt2 d_mo_energies_first,
-    OutputIt3 d_mos_first);
+    OutputIt3 d_mos_first,
+    EigSolver<T> eig_solver);
 
 /**
  *  @brief Factors in the effective Hamiltonians of LMO SCF MI for each unit.
@@ -292,7 +297,8 @@ struct ProjectionFactors<ScfMiMethod::LMO, T> final {
       InputIt unit_basis_first,
       OutputIt1 d_eff_h_op_first,
       OutputIt2 d_mo_energies_first,
-      OutputIt3 d_mos_first);
+      OutputIt3 d_mos_first,
+      EigSolver<T> eig_solver);
 
  private:
   /**
@@ -403,7 +409,8 @@ void SolveScfMi(
     InputIt unit_basis_first,
     OutputIt1 d_eff_h_op_first,
     OutputIt2 d_mo_energies_first,
-    OutputIt3 d_mos_first) {
+    OutputIt3 d_mos_first,
+    EigSolver<T> eig_solver) {
   const auto &prefactors = proj_factors.prefactors_;
   const auto &postfactors = proj_factors.postfactors_;
 
@@ -443,29 +450,31 @@ void SolveScfMi(
     const auto eff_h_mat = MatrixProduct(
         mpi_comm, unit_basis_t, eff_h_ops[unit_idx], unit_basis);
 
-    // Buffers for energies and coefficient matrix.
-    Col<complex_t> unit_mo_energies_buf;
-    Mat<complex_t> unit_mo_coeffs_buf;
+    // Energies (as eigenvalues) and coefficient matrix (as eigenvectors).
+    Col<real_t> unit_mo_energies;
+    Mat<T> unit_mo_coeffs;
 
-    arma::eig_pair(
-        unit_mo_energies_buf, unit_mo_coeffs_buf,
+    eig_solver(
+        unit_mo_energies, unit_mo_coeffs,
         eff_h_mat, MatrixProduct(mpi_comm, unit_basis_t, unit_basis));
+
+    if (!unit_mo_coeffs.is_square()) {
+      throw std::runtime_error("Eigenvectors are not in a square matrix.");
+    }
+
+    if (unit_mo_coeffs.n_cols != unit_mo_energies.n_elem) {
+      throw std::runtime_error(
+          "Number of eigenvectors is not equal to the number of eigenvalues.");
+    }
 
     // Output effective Hamiltonian operator.
     static_cast<Mat<T> &>(*d_eff_h_op_it++) = std::move(eff_h_ops[unit_idx]);
 
     // Indices of energies in ascending order.
-    uvec energy_sort_idxs(arma::size(unit_mo_energies_buf));
+    uvec energy_sort_idxs(arma::size(unit_mo_energies));
 
     // Output energies as real numbers in ascending order.
     {
-      Col<real_t> unit_mo_energies(arma::size(unit_mo_energies_buf));
-      std::transform(
-          unit_mo_energies_buf.begin(),
-          unit_mo_energies_buf.end(),
-          unit_mo_energies.begin(),
-          [](const complex_t &item) -> real_t { return item.real(); });
-
       StableIndexSort(
           unit_mo_energies.begin(),
           unit_mo_energies.end(),
@@ -477,14 +486,6 @@ void SolveScfMi(
 
     // Output ket matrix of molecular orbitals in ascending order by energy.
     {
-      // Coefficient matrix with numbers in the destination type.
-      Mat<T> unit_mo_coeffs(arma::size(unit_mo_coeffs_buf));
-      std::transform(
-          unit_mo_coeffs_buf.begin(),
-          unit_mo_coeffs_buf.end(),
-          unit_mo_coeffs.begin(),
-          [](const complex_t &item) -> T { return NumberCast<T>(item); });
-
       // Ket matrix of normalized molecular orbitals.
       const Mat<T> unit_mos(
           arma::normalise(
