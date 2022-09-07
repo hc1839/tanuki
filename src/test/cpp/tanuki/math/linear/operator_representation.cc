@@ -48,10 +48,10 @@ void TEST_OperatorRepresentation_BraKet(size_t mat_size) {
   const Mat<T> input_op_mat_rep(mat_size, mat_size, arma::fill::randu);
 
   const auto op_braketmat = CreateOperatorBraKetMatrix(
-      input_op_mat_rep, basis_ketmat, false);
+      MPI_COMM_WORLD, input_op_mat_rep, basis_ketmat, false);
 
-  const auto output_op_mat_rep = CreateOperatorMatrixRep(
-      op_braketmat, basis_ketmat);
+  const auto output_op_mat_rep = MatrixProduct(
+      MPI_COMM_WORLD, Mat<T>(basis_ketmat.t()), op_braketmat, basis_ketmat);
 
   const bool is_equal = arma::approx_equal(
       input_op_mat_rep,

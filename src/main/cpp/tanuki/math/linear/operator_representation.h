@@ -19,6 +19,9 @@ using arma::Mat;
  *    tanuki::number::real_t @endlink or @link tanuki::number::complex_t
  *    @endlink.
  *
+ *  @param mpi_comm
+ *    MPI communicator.
+ *
  *  @param op_mat_rep
  *    Matrix representation of the operator in <tt>basis</tt>.
  *
@@ -32,9 +35,6 @@ using arma::Mat;
  *    operator can be returned. Such additional conjugate transposition is
  *    unnecessary for a Hermitian operator.
  *
- *  @param comm
- *    MPI communicator.
- *
  *  @return
  *    Operator in bra-ket matrix. It is \f$ \hat{\mathcal{O}} \f$ in \f$
  *    \boldsymbol{\Phi}^{\dagger} \hat{\mathcal{O}} \boldsymbol{\Phi} =
@@ -43,41 +43,10 @@ using arma::Mat;
  */
 template <typename T>
 Mat<T> CreateOperatorBraKetMatrix(
+    MPI_Comm mpi_comm,
     const Mat<T> &op_mat_rep,
     const Mat<T> &basis,
-    bool is_hermitian,
-    MPI_Comm comm = MPI_COMM_WORLD);
-
-/**
- *  @brief Creates the matrix representation of an operator in the specified
- *  basis functions using the bra-ket matrix of the operator.
- *
- *  @tparam T
- *    Type of elements in an Armadillo matrix. It must be @link
- *    tanuki::number::real_t @endlink or @link tanuki::number::complex_t
- *    @endlink.
- *
- *  @param op_braketmat
- *    Operator in bra-ket matrix.
- *
- *  @param basis
- *    Basis functions as a ket matrix. It is the upper triangular matrix from
- *    the Cholesky decomposition of the basis overlap matrix.
- *
- *  @param comm
- *    MPI communicator.
- *
- *  @return
- *    Matrix representation of the operator. It is \f$
- *    \boldsymbol{\Phi}^{\dagger} \hat{\mathcal{O}} \boldsymbol{\Phi} \f$,
- *    where \f$ \boldsymbol{\Phi} \f$ is <tt>basis</tt>, and \f$
- *    \hat{\mathcal{O}} \f$ is <tt>op_braketmat</tt>.
- */
-template <typename T>
-Mat<T> CreateOperatorMatrixRep(
-    const Mat<T> &op_braketmat,
-    const Mat<T> &basis,
-    MPI_Comm comm = MPI_COMM_WORLD);
+    bool is_hermitian);
 
 } // namespace linear
 } // namespace math
