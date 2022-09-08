@@ -12,6 +12,10 @@
 #include <type_traits>
 #include <vector>
 
+#include <avro/Decoder.hh>
+#include <avro/Encoder.hh>
+#include <avro/Specific.hh>
+
 #include "tanuki/interop/foreign_iterator.h"
 #include "tanuki/memory/storage_order.h"
 
@@ -512,5 +516,50 @@ using ForeignContainer = ForeignMultiArray<T, 1>;
 
 } // namespace interop
 } // namespace tanuki
+
+namespace avro {
+
+using tanuki::interop::ForeignContainer;
+
+/**
+ *  @brief Encoding and decoding of @link ForeignContainer @endlink.
+ *
+ *  Avro schema is <tt>array</tt>, where each item has the Avro type
+ *  corresponding to <tt>T</tt>.
+ *
+ *  For decoding, items are decoded starting at the beginning of the foreign
+ *  container, which must be allocated to a size that can contain the decoded
+ *  items. For each item, the backing pointer must not be reassigned.
+ *
+ *  @tparam T
+ *    Type of decorated items. It must be Avro encodable and decodable.
+ */
+template <typename T>
+struct codec_traits<ForeignContainer<T>> {
+ public:
+  static void encode(Encoder &e, const ForeignContainer<T> &o) {
+    e.arrayStart();
+    if (!o.empty()) {
+      e.setItemCount(o.size());
+      for (const auto &item : o) {
+        e.startItem();
+        avro::encode(e, item);
+      }
+    }
+    e.arrayEnd();
+  }
+
+  static void decode(Decoder &d, ForeignContainer<T> &o) {
+    auto d_item_it = o.begin();
+    for (size_t n = d.arrayStart(); n != 0; n = d.arrayNext()) {
+      for (size_t i = 0; i != n; ++i) {
+        auto d_item = *d_item_it++;
+        avro::decode(d, d_item);
+      }
+    }
+  }
+};
+
+} // namespace avro
 
 #endif
