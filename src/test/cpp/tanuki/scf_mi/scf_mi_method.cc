@@ -24,7 +24,8 @@ TEST(ScfMiMethod, Avro) {
   const auto &schema = ScfMiMethodAvroSchema();
 
   const vector<ScfMiMethod> inputs = {
-    ScfMiMethod::LMO
+    ScfMiMethod::LMO,
+    ScfMiMethod::LP
   };
 
   for (const auto &input : inputs) {
@@ -50,7 +51,8 @@ TEST(ScfMiMethod, Avro) {
  */
 TEST(ScfMiMethod, Name) {
   const map<ScfMiMethod, string> inputs = {
-    { ScfMiMethod::LMO, "LMO" }
+    { ScfMiMethod::LMO, "LMO" },
+    { ScfMiMethod::LP, "LP" }
   };
 
   for (const auto &input : inputs) {

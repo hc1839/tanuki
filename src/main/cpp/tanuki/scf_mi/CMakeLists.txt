@@ -9,6 +9,7 @@ list(
   HDRS
 
   tanuki/scf_mi/lmo_projection_factors.h
+  tanuki/scf_mi/lp_projection_factors.h
   tanuki/scf_mi/projection_factors.h
   tanuki/scf_mi/scf_mi_method.h
 )

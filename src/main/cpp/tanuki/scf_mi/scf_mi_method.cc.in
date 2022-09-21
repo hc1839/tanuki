@@ -65,7 +65,8 @@ std::string EnumNameOf(tanuki::scf_mi::ScfMiMethod enumerator) {
   using tanuki::scf_mi::ScfMiMethod;
 
   static const std::map<ScfMiMethod, std::string> mapping = {
-    { ScfMiMethod::LMO, "LMO" }
+    { ScfMiMethod::LMO, "LMO" },
+    { ScfMiMethod::LP, "LP" }
   };
 
   return mapping.at(enumerator);
@@ -75,8 +76,9 @@ template <>
 tanuki::scf_mi::ScfMiMethod EnumValueOf(const std::string &name) {
   using tanuki::scf_mi::ScfMiMethod;
 
-  static const std::array<ScfMiMethod, 1> enumerators = {
-    ScfMiMethod::LMO
+  static const std::array<ScfMiMethod, 2> enumerators = {
+    ScfMiMethod::LMO,
+    ScfMiMethod::LP
   };
 
   for (const auto &enumerator : enumerators) {

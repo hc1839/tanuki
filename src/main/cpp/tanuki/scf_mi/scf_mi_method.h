@@ -20,7 +20,12 @@ enum class ScfMiMethod : int {
   /**
    *  @brief LMO SCF MI (Stoll 1980).
    */
-  LMO
+  LMO,
+
+  /**
+   *  @brief LP SCF MI (Nagata 2001).
+   */
+  LP
 };
 
 /**
