@@ -12,6 +12,7 @@ list(
   tanuki/math/combinatorics/round_robin_tourney.h
   tanuki/math/comparison.h
   tanuki/math/linear/cholesky_decomposition.h
+  tanuki/math/linear/equation_system.h
   tanuki/math/linear/indexed_vector_pair.h
   tanuki/math/linear/iterated_gram_schmidt.h
   tanuki/math/linear/matrix_index_pair.h
