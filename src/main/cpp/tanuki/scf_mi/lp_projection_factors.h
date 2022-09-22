@@ -13,6 +13,7 @@
 
 #include "tanuki/algorithm/algorithm.h"
 #include "tanuki/math/linear/eigen.h"
+#include "tanuki/math/linear/equation_system.h"
 #include "tanuki/math/linear/matrix_product.h"
 #include "tanuki/number/types.h"
 #include "tanuki/scf_mi/projection_factors.h"
@@ -27,51 +28,14 @@ using arma::Mat;
 using arma::uvec;
 
 using tanuki::algorithm::StableIndexSort;
+using tanuki::math::linear::DuoProduct;
 using tanuki::math::linear::EigSolver;
+using tanuki::math::linear::EquationSystemSolution;
 using tanuki::math::linear::MatrixProduct;
 using tanuki::number::real_t;
 
 template <typename T>
 using LpProjectionFactors = ProjectionFactors<ScfMiMethod::LP, T>;
-
-/**
- *  @brief Creates the effective Hamiltonians of LP SCF MI for each unit.
- *
- *  @tparam T
- *    Type of numbers in the bra-ket matrices. It must be @link
- *    tanuki::number::real_t @endlink or @link tanuki::number::complex_t
- *    @endlink.
- *
- *  @tparam OutputIt
- *    Must meet the requirements of <tt>LegacyOutputIterator</tt> and have a
- *    dereferenced type that is convertible to <tt>arma::Mat</tt>.
- *
- *  @param mpi_comm
- *    MPI communicator.
- *
- *  @param proj_factors
- *    Projection factors. It must not be empty.
- *
- *  @param sys_h_op
- *    System Hamiltonian operator in bra-ket matrix. Its size must agree with
- *    the factors in <tt>proj_factors</tt>.
- *
- *  @param d_eff_h_op_first
- *    Beginning of the destination range of effective Hamiltonian operators in
- *    bra-ket matrix for each unit.
- */
-template <
-    typename T, typename OutputIt,
-    typename std::enable_if<
-        std::is_convertible<
-            typename std::iterator_traits<OutputIt>::value_type,
-            Mat<T>>::value,
-        bool>::type = true>
-void ScfMiHamiltonians(
-    MPI_Comm mpi_comm,
-    const LpProjectionFactors<T> &proj_factors,
-    const Mat<T> &sys_h_op,
-    OutputIt d_eff_h_op_first);
 
 /**
  *  @brief Solves the eigenvalue equations of LP SCF MI for each unit.
@@ -111,9 +75,9 @@ void ScfMiHamiltonians(
  *  @param unit_basis_first
  *    Beginning of the range of ket matrices of basis for each unit.
  *
- *  @param d_eff_h_op_first
- *    Beginning of the destination range of effective Hamiltonian operators in
- *    bra-ket matrix for each unit.
+ *  @param d_eff_h_mat_first
+ *    Beginning of the destination range of effective Hamiltonian matrices in
+ *    the representation of unit basis set for each unit.
  *
  *  @param d_mo_energies_first
  *    Beginning of the destination range of ascending energies of spatial
@@ -157,7 +121,7 @@ void SolveScfMi(
     const LpProjectionFactors<T> &proj_factors,
     const Mat<T> &sys_h_op,
     InputIt unit_basis_first,
-    OutputIt1 d_eff_h_op_first,
+    OutputIt1 d_eff_h_mat_first,
     OutputIt2 d_mo_energies_first,
     OutputIt3 d_mos_first,
     EigSolver<T> eig_solver);
@@ -223,19 +187,6 @@ struct ProjectionFactors<ScfMiMethod::LP, T> final {
   }
 
   template <
-      typename T, typename OutputIt,
-      typename std::enable_if<
-          std::is_convertible<
-              typename std::iterator_traits<OutputIt>::value_type,
-              Mat<T>>::value,
-          bool>::type>
-  friend void ScfMiHamiltonians(
-      MPI_Comm mpi_comm,
-      const LpProjectionFactors<T> &proj_factors,
-      const Mat<T> &sys_h_op,
-      OutputIt d_eff_h_op_first);
-
-  template <
       typename T,
       typename InputIt,
       typename OutputIt1,
@@ -266,7 +217,7 @@ struct ProjectionFactors<ScfMiMethod::LP, T> final {
       const LpProjectionFactors<T> &proj_factors,
       const Mat<T> &sys_h_op,
       InputIt unit_basis_first,
-      OutputIt1 d_eff_h_op_first,
+      OutputIt1 d_eff_h_mat_first,
       OutputIt2 d_mo_energies_first,
       OutputIt3 d_mos_first,
       EigSolver<T> eig_solver);
@@ -282,41 +233,6 @@ struct ProjectionFactors<ScfMiMethod::LP, T> final {
    */
   vector<Mat<T>> proj_ops_;
 };
-
-template <
-    typename T, typename OutputIt,
-    typename std::enable_if<
-        std::is_convertible<
-            typename std::iterator_traits<OutputIt>::value_type,
-            Mat<T>>::value,
-        bool>::type>
-void ScfMiHamiltonians(
-    MPI_Comm mpi_comm,
-    const LpProjectionFactors<T> &proj_factors,
-    const Mat<T> &sys_h_op,
-    OutputIt d_eff_h_op_first) {
-  const auto &proj_ops = proj_factors.proj_ops_;
-
-  if (proj_ops.empty()) {
-    throw std::logic_error("Projection factors are empty.");
-  }
-
-  const size_t num_units = proj_ops.size();
-
-  auto proj_op_it = proj_ops.begin();
-  auto d_eff_h_op_it = d_eff_h_op_first;
-
-  // Create and output effective Hamiltonian operators for each unit.
-  for (size_t unit_idx = 0; unit_idx != num_units; ++unit_idx) {
-    const auto &proj_op = *proj_op_it++;
-
-    // Effective Hamiltonian operator.
-    auto eff_h_op = MatrixProduct(mpi_comm, proj_op, sys_h_op, proj_op);
-
-    // Output effective Hamiltonian operator.
-    static_cast<Mat<T> &>(*d_eff_h_op_it++) = std::move(eff_h_op);
-  }
-}
 
 template <
     typename T,
@@ -349,7 +265,7 @@ void SolveScfMi(
     const LpProjectionFactors<T> &proj_factors,
     const Mat<T> &sys_h_op,
     InputIt unit_basis_first,
-    OutputIt1 d_eff_h_op_first,
+    OutputIt1 d_eff_h_mat_first,
     OutputIt2 d_mo_energies_first,
     OutputIt3 d_mos_first,
     EigSolver<T> eig_solver) {
@@ -366,14 +282,9 @@ void SolveScfMi(
   auto unit_basis_it = unit_basis_first;
 
   // Output iterators.
-  auto d_eff_h_op_it = d_eff_h_op_first;
+  auto d_eff_h_mat_it = d_eff_h_mat_first;
   auto d_mo_energies_it = d_mo_energies_first;
   auto d_mos_it = d_mos_first;
-
-  // Effective Hamiltonian operators.
-  vector<Mat<T>> eff_h_ops(num_units);
-
-  ScfMiHamiltonians(mpi_comm, proj_factors, sys_h_op, eff_h_ops.begin());
 
   for (size_t unit_idx = 0; unit_idx != num_units; ++unit_idx) {
     const auto &proj_op = *proj_op_it++;
@@ -381,9 +292,12 @@ void SolveScfMi(
 
     const Mat<T> unit_basis_t(unit_basis.t());
 
-    // Effective Hamiltonian matrix.
+    // Effective Hamiltonian operator.
+    const auto eff_h_op = MatrixProduct(mpi_comm, proj_op, sys_h_op, proj_op);
+
+    // Effective Hamiltonian matrix with respect to projected unit basis set.
     const auto eff_h_mat = MatrixProduct(
-        mpi_comm, unit_basis_t, eff_h_ops[unit_idx], unit_basis);
+        mpi_comm, unit_basis_t, eff_h_op, unit_basis);
 
     // Overlap matrix of projected unit basis set.
     const auto proj_unit_basis_overlap = MatrixProduct(
@@ -406,8 +320,34 @@ void SolveScfMi(
           "Number of eigenvectors is not equal to the number of eigenvalues.");
     }
 
-    // Output effective Hamiltonian operator.
-    static_cast<Mat<T> &>(*d_eff_h_op_it++) = std::move(eff_h_ops[unit_idx]);
+    // Create and output effective Hamiltonian matrix with respect to original
+    // unit basis set.
+    {
+      // Overlap matrix of original unit basis set.
+      const auto unit_basis_overlap = MatrixProduct(
+          mpi_comm, unit_basis_t, unit_basis);
+
+      const auto proj_unit_mo_coeffs = EquationSystemSolution(
+          mpi_comm,
+          unit_basis_overlap,
+          MatrixProduct(
+              mpi_comm, proj_unit_basis_overlap, unit_mo_coeffs));
+
+      // Coefficient matrix of equation system.
+      const Mat<T> eqsys_coeffs(proj_unit_mo_coeffs.t());
+
+      // Constant matrix of equation system.
+      const Mat<T> eqsys_constants(
+          MatrixProduct(
+              mpi_comm,
+              unit_basis_overlap,
+              DuoProduct(
+                  mpi_comm,
+                  proj_unit_mo_coeffs, unit_mo_energies.begin())).t());
+
+      static_cast<Mat<T> &>(*d_eff_h_mat_it++) = EquationSystemSolution(
+          mpi_comm, eqsys_coeffs, eqsys_constants).t();
+    }
 
     // Indices of energies in ascending order.
     uvec energy_sort_idxs(arma::size(unit_mo_energies));
