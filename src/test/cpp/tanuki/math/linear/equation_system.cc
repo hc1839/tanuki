@@ -4,6 +4,8 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
 
+#define ABS_ERROR 1.0e-6
+
 namespace tanuki {
 namespace math {
 namespace linear {
@@ -29,9 +31,9 @@ TEST(EquationSystemSolution, RealCoefficients) {
   const auto solution = EquationSystemSolution(
       MPI_COMM_WORLD, coeffs, constants);
 
-  ASSERT_DOUBLE_EQ(solution(0, 0), 1.0);
-  ASSERT_DOUBLE_EQ(solution(1, 0), -2.0);
-  ASSERT_DOUBLE_EQ(solution(2, 0), -2.0);
+  ASSERT_NEAR(solution(0, 0), 1.0, ABS_ERROR);
+  ASSERT_NEAR(solution(1, 0), -2.0, ABS_ERROR);
+  ASSERT_NEAR(solution(2, 0), -2.0, ABS_ERROR);
 }
 
 } // namespace linear

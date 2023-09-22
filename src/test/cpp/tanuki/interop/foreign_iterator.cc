@@ -24,7 +24,13 @@ using tanuki::interop::ForeignIterator;
  */
 struct ForeignElementMock final {
  public:
-  bool operator==(const ForeignElementMock &other) const = default;
+  bool operator==(const ForeignElementMock &other) const {
+    return id == other.id && codes == other.codes;
+  }
+
+  bool operator!=(const ForeignElementMock &other) const {
+    return !(*this == other);
+  }
 
   size_t id;
 

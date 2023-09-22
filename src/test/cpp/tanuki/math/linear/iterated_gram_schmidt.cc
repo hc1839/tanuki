@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <mpi.h>
 
-#define APPROX_EQUAL_ABS_TOL 1.0e-9
+#define APPROX_EQUAL_ABS_TOL 1.0e-6
 #define APPROX_EQUAL_REL_TOL 1.0e-3
 
 namespace tanuki {

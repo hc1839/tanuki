@@ -1,10 +1,7 @@
-#ifndef TANUKI_MATH_COMPARISON_HXX
-#define TANUKI_MATH_COMPARISON_HXX
+#include "tanuki/math/comparison.h"
 
 #include <algorithm>
 #include <cmath>
-
-#include "tanuki/number/types.h"
 
 namespace tanuki {
 namespace math {
@@ -40,5 +37,3 @@ bool ApproxEqualAbs(complex_t a, complex_t b, real_t tol) {
 
 } // namespace math
 } // namespace tanuki
-
-#endif

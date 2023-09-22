@@ -91,6 +91,7 @@ ForeignIterator<T, D> &ForeignIterator<T, D>::operator++() {
   ++item_index_;
   item_->~value_type();
   new(item_.get()) T(ptr_);
+  return *this;
 }
 
 template <typename T, typename D>
@@ -106,6 +107,7 @@ ForeignIterator<T, D> &ForeignIterator<T, D>::operator--() {
   --item_index_;
   item_->~value_type();
   new(item_.get()) T(ptr_);
+  return *this;
 }
 
 template <typename T, typename D>

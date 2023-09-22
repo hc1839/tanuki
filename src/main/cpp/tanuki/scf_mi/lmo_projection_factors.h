@@ -213,7 +213,7 @@ struct ProjectionFactors<ScfMiMethod::LMO, T> final {
   }
 
   template <
-      typename T,
+      typename U,
       typename InputIt,
       typename OutputIt1,
       typename OutputIt2,
@@ -221,12 +221,12 @@ struct ProjectionFactors<ScfMiMethod::LMO, T> final {
       typename std::enable_if<
           std::is_convertible<
               typename std::iterator_traits<InputIt>::value_type,
-              Mat<T>>::value,
+              Mat<U>>::value,
           bool>::type,
       typename std::enable_if<
           std::is_convertible<
               typename std::iterator_traits<OutputIt1>::value_type,
-              Mat<T>>::value,
+              Mat<U>>::value,
           bool>::type,
       typename std::enable_if<
           std::is_convertible<
@@ -236,17 +236,17 @@ struct ProjectionFactors<ScfMiMethod::LMO, T> final {
       typename std::enable_if<
           std::is_convertible<
               typename std::iterator_traits<OutputIt3>::value_type,
-              Mat<T>>::value,
+              Mat<U>>::value,
           bool>::type>
   friend void SolveScfMi(
       MPI_Comm mpi_comm,
-      const LmoProjectionFactors<T> &proj_factors,
-      const Mat<T> &sys_h_op,
+      const LmoProjectionFactors<U> &proj_factors,
+      const Mat<U> &sys_h_op,
       InputIt unit_basis_first,
       OutputIt1 d_eff_h_mat_first,
       OutputIt2 d_mo_energies_first,
       OutputIt3 d_mos_first,
-      EigSolver<T> eig_solver);
+      EigSolver<U> eig_solver);
 
  private:
   /**

@@ -31,6 +31,7 @@ list(
 
   ${BUILD_SRC_MAIN_CPP_DIR}/tanuki/math/linear/number_array.cc
   ${SRC_MAIN_CPP_DIR}/tanuki/math/combinatorics/combinations.cc
+  ${SRC_MAIN_CPP_DIR}/tanuki/math/comparison.cc
   ${SRC_MAIN_CPP_DIR}/tanuki/math/linear/rotation_matrix_spec.cc
 )
 

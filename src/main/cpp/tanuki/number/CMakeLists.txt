@@ -12,5 +12,12 @@ list(
   tanuki/number/types.h
 )
 
+list(
+  APPEND
+  SRCS
+
+  ${SRC_MAIN_CPP_DIR}/tanuki/number/number_cast.cc
+)
+
 set(HDRS ${HDRS} PARENT_SCOPE)
 set(SRCS ${SRCS} PARENT_SCOPE)

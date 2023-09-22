@@ -1,8 +1,12 @@
 #ifndef TANUKI_MATH_COMPARISON_H
 #define TANUKI_MATH_COMPARISON_H
 
+#include "tanuki/number/types.h"
+
 namespace tanuki {
 namespace math {
+
+using tanuki::number::real_t;
 
 /**
  *  @brief Whether two numbers are approximately equal within a relative
@@ -59,7 +63,5 @@ bool ApproxEqualAbs(T a, T b, real_t tol);
 
 } // namespace math
 } // namespace tanuki
-
-#include "tanuki/math/comparison.hxx"
 
 #endif
