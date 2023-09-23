@@ -146,7 +146,7 @@ size_t RoundRobinTourney<T>::num_rounds() const {
 template <typename T>
 size_t RoundRobinTourney<T>::num_pairs_per_round(bool include_idle) const {
   if (num_competitors & 1) {
-    return (num_competitors - 1 >> 1) + (include_idle ? 1 : 0);
+    return ((num_competitors - 1) >> 1) + (include_idle ? 1 : 0);
   } else {
     return num_competitors >> 1;
   }

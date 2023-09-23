@@ -6,7 +6,6 @@ list(
   tanuki/interop/c_multi_array.h
   tanuki/interop/c_poly_pointer.h
   tanuki/interop/c_sequence.h
-  tanuki/interop/foreign_forwarder.h
   tanuki/interop/foreign_iterator.h
   tanuki/interop/foreign_multi_array.h
   tanuki/interop/foreign_multi_array_ref.h

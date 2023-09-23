@@ -208,8 +208,8 @@ Result<T> Actuator<T>::Actuate(const Mat<T> &input, InquiryFn inquiry_fn) {
                ++rp) {
             MatrixIndexPair indices = {
               .type = MatrixIndexPair::PairType::COLUMNS,
-              .first = rotation_pairs(0, rp),
-              .second = rotation_pairs(1, rp)
+              .first = static_cast<size_t>(rotation_pairs(0, rp)),
+              .second = static_cast<size_t>(rotation_pairs(1, rp))
             };
 
             // Ensure the first index is not greater than the second.

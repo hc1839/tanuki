@@ -103,10 +103,13 @@ find_package(
 )
 
 find_package(MPI REQUIRED)
-find_package(OpenMP REQUIRED)
 
-set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS})
+# Work around a bug in CMake finding Clang OpenMP.
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+  set(OpenMP_CXX_FLAGS "-fopenmp")
+else()
+  find_package(OpenMP REQUIRED)
+endif()
 
 include_directories(
   ${CPATH}
@@ -115,6 +118,13 @@ include_directories(
   ${MPI_CXX_INCLUDE_DIRS}
   ${OpenMP_CXX_INCLUDE_DIRS}
 )
+
+# Compile and link options.
+
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS})
+add_compile_options("-Wno-ignored-optimization-argument")
 
 # Add subdirectories, and configure files.
 
@@ -187,6 +197,7 @@ target_link_libraries(
   ${AVRO_LIB}
   ${Boost_LIBRARIES}
   MPI::MPI_CXX
+  stdc++
 )
 
 # Set the file name of the shared library.
@@ -291,6 +302,7 @@ if(BUILD_TEST)
     ${Boost_LIBRARIES}
     MPI::MPI_CXX
     gtest_main
+    stdc++
     tanuki_s
   )
 
